@@ -14,10 +14,10 @@ object KediBiloPlayer {
     ): ExoPlayer {
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                2_000,
-                bufferMaxMs,
-                1_500,
-                3_000
+                /* minBufferMs              */ bufferMinMs,
+                /* maxBufferMs              */ bufferMaxMs,
+                /* bufferForPlaybackMs      */ 1_500,
+                /* bufferForPlaybackAfterRebufferMs */ 5_000
             )
             .build()
 

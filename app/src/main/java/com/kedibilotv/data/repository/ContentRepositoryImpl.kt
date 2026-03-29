@@ -39,14 +39,14 @@ class ContentRepositoryImpl @Inject constructor(
         return try {
             val items = when (type) {
                 ContentType.LIVE -> api.getLiveStreams()
-                    .filter { it.categoryId == categoryId }
-                    .map { ContentItem(it.streamId, it.name, type, it.categoryId, it.streamIcon, it.rating) }
+                    .filter { it.streamId != null && it.categoryId == categoryId }
+                    .map { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating) }
                 ContentType.VOD -> api.getVodStreams()
-                    .filter { it.categoryId == categoryId }
-                    .map { ContentItem(it.streamId, it.name, type, it.categoryId, it.streamIcon, it.rating) }
+                    .filter { it.streamId != null && it.categoryId == categoryId }
+                    .map { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating) }
                 ContentType.SERIES -> api.getSeries()
-                    .filter { it.categoryId == categoryId }
-                    .map { ContentItem(it.seriesId, it.name, type, it.categoryId, it.cover, it.rating) }
+                    .filter { it.seriesId != null && it.categoryId == categoryId }
+                    .map { ContentItem(it.seriesId!!, it.name, type, it.categoryId ?: "", it.cover, it.rating) }
             }
             contentCache[key] = items
             Result.success(items)
@@ -60,7 +60,8 @@ class ContentRepositoryImpl @Inject constructor(
         contentCache["ALL_VOD"]?.let { return Result.success(it) }
         return try {
             val items = api.getVodStreams()
-                .map { ContentItem(it.streamId, it.name, ContentType.VOD, it.categoryId, it.streamIcon, it.rating) }
+                .filter { it.streamId != null }
+                .map { ContentItem(it.streamId!!, it.name, ContentType.VOD, it.categoryId ?: "", it.streamIcon, it.rating) }
             contentCache["ALL_VOD"] = items
             Result.success(items)
         } catch (e: Exception) {

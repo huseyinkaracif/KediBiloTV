@@ -91,37 +91,22 @@ class LoginViewModel @Inject constructor(
 
     private fun loginWithM3uUrl(rawUrl: String) {
         if (rawUrl.isBlank()) {
-            _state.value = _state.value.copy(error = "URL bos olamaz")
+            _state.value = _state.value.copy(error = "URL boş olamaz")
             return
         }
-        val parsed = parseM3uUrl(rawUrl.trim())
-        if (parsed == null) {
-            _state.value = _state.value.copy(error = "Gecersiz URL. username ve password parametresi olmali.")
+        val url = rawUrl.trim()
+        val uri = try { android.net.Uri.parse(url) } catch (e: Exception) { null }
+        if (uri?.getQueryParameter("username") == null || uri.getQueryParameter("password") == null) {
+            _state.value = _state.value.copy(error = "Geçersiz URL. username= ve password= parametreleri olmalı.")
             return
         }
-        val (serverUrl, username, password) = parsed
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            val result = loginUseCase(serverUrl, username, password)
+            val result = authRepository.loginM3u(url)
             result.fold(
                 onSuccess = { _state.value = _state.value.copy(isLoading = false, isLoggedIn = true) },
                 onFailure = { _state.value = _state.value.copy(isLoading = false, error = it.message) }
             )
-        }
-    }
-
-    private fun parseM3uUrl(url: String): Triple<String, String, String>? {
-        return try {
-            val uri = android.net.Uri.parse(url)
-            val username = uri.getQueryParameter("username")?.trim() ?: return null
-            val password = uri.getQueryParameter("password")?.trim() ?: return null
-            val serverUrl = buildString {
-                append(uri.scheme).append("://").append(uri.authority)
-                if (!uri.path.isNullOrBlank()) append(uri.path)
-            }
-            Triple(serverUrl, username, password)
-        } catch (e: Exception) {
-            null
         }
     }
 }

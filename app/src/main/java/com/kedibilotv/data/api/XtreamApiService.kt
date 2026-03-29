@@ -24,6 +24,7 @@ class XtreamApiService @Inject constructor(
         baseUrl = url
         username = user.trim()
         password = pass.trim()
+        android.util.Log.d("KediBilo", "configure → baseUrl=$baseUrl  user=$username")
     }
 
     private fun apiUrl(action: String? = null): String {
@@ -39,8 +40,43 @@ class XtreamApiService @Inject constructor(
 
     var onUnauthorized: (() -> Unit)? = null
 
-    suspend fun authenticate(): AuthResponse =
-        client.get(apiUrl()).body()
+    suspend fun authenticateExactUrl(rawUrl: String) {
+        android.util.Log.d("KediBilo", "authenticateExactUrl → GET $rawUrl")
+        val response = client.get(rawUrl)
+        val status = response.status.value
+        android.util.Log.d("KediBilo", "authenticateExactUrl ← HTTP $status")
+        if (status == 511 || status == 407) {
+            throw Exception("Ağ erişimi engellendi (HTTP $status). VPN veya ağ ayarlarını kontrol et.")
+        }
+        if (status == 401 || status == 403) {
+            throw Exception("Kullanıcı adı veya şifre hatalı (HTTP $status).")
+        }
+        if (status >= 400) {
+            throw Exception("Sunucu hatası: HTTP $status")
+        }
+    }
+
+    suspend fun authenticate(): AuthResponse {
+        val url = apiUrl()
+        android.util.Log.d("KediBilo", "authenticate → GET $url")
+        val response = client.get(url)
+        val status = response.status.value
+        val contentType = response.headers["Content-Type"] ?: ""
+        android.util.Log.d("KediBilo", "authenticate ← HTTP $status  Content-Type: $contentType")
+        if (status == 511 || status == 407) {
+            throw Exception("Ağ erişimi engellendi (HTTP $status). VPN veya ağ ayarlarını kontrol et.")
+        }
+        if (status == 401 || status == 403) {
+            throw Exception("Kullanıcı adı veya şifre hatalı (HTTP $status).")
+        }
+        if (status >= 400) {
+            throw Exception("Sunucu hatası: HTTP $status")
+        }
+        if (!contentType.contains("application/json", ignoreCase = true)) {
+            throw Exception("Sunucu JSON döndürmedi ($contentType). URL'i kontrol et.")
+        }
+        return response.body()
+    }
 
     suspend fun <T> safeGet(url: String, parse: suspend () -> T): T {
         val response = client.get(url)
