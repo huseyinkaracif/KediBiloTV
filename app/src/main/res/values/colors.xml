@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="kedi_orange">#FFFF8C00</color>
-    <color name="kedi_background">#FF0D1117</color>
-    <color name="kedi_surface">#FF1A1A2E</color>
+    <!-- Neon Gatos Cinema -->
+    <color name="neon_background">#FF040E0E</color>
+    <color name="neon_surface">#FF0A1A1A</color>
+    <color name="neon_coral">#FFFF4500</color>
+    <color name="neon_cyan">#FF00FFD1</color>
+    <color name="neon_fuchsia">#FFFF0080</color>
 </resources>

@@ -5,15 +5,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// NunitoFamily is commented out until nunito_bold.ttf is added to res/font/
-// val NunitoFamily = FontFamily(Font(R.font.nunito_bold, FontWeight.Bold))
+// Neon Gatos Cinema tipografisi
+// Başlıklar: ExtraBold / Black ağırlık — güçlü, sinema poster hissi
+// Gövde: Regular — temiz, okunabilir
 
 val KediTypography = Typography(
-    headlineLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 28.sp),
-    headlineMedium = TextStyle(fontWeight = FontWeight.Bold, fontSize = 22.sp),
-    titleLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp),
-    titleMedium = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
-    bodyLarge = TextStyle(fontSize = 16.sp),
-    bodyMedium = TextStyle(fontSize = 14.sp),
-    labelLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 14.sp)
+    displayLarge  = TextStyle(fontWeight = FontWeight.Black,    fontSize = 36.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(fontWeight = FontWeight.Black,    fontSize = 30.sp, letterSpacing = (-0.3).sp),
+    headlineMedium= TextStyle(fontWeight = FontWeight.ExtraBold,fontSize = 24.sp, letterSpacing = (-0.2).sp),
+    headlineSmall = TextStyle(fontWeight = FontWeight.ExtraBold,fontSize = 20.sp),
+    titleLarge    = TextStyle(fontWeight = FontWeight.Bold,     fontSize = 18.sp),
+    titleMedium   = TextStyle(fontWeight = FontWeight.Bold,     fontSize = 16.sp, letterSpacing = 0.1.sp),
+    titleSmall    = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 14.sp, letterSpacing = 0.1.sp),
+    bodyLarge     = TextStyle(fontWeight = FontWeight.Normal,   fontSize = 16.sp),
+    bodyMedium    = TextStyle(fontWeight = FontWeight.Normal,   fontSize = 14.sp),
+    bodySmall     = TextStyle(fontWeight = FontWeight.Normal,   fontSize = 12.sp),
+    labelLarge    = TextStyle(fontWeight = FontWeight.Bold,     fontSize = 14.sp, letterSpacing = 0.5.sp),
+    labelMedium   = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 12.sp, letterSpacing = 0.4.sp),
+    labelSmall    = TextStyle(fontWeight = FontWeight.Medium,   fontSize = 11.sp, letterSpacing = 0.5.sp),
 )

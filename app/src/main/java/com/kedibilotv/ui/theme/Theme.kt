@@ -4,24 +4,42 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
-private val KediColorScheme = darkColorScheme(
-    primary = KediOrange,
-    secondary = KediOrangeLight,
-    background = KediBackground,
-    surface = KediSurface,
-    onPrimary = KediTextPrimary,
-    onSecondary = KediBackground,
-    onBackground = KediTextPrimary,
-    onSurface = KediTextPrimary,
-    error = KediError,
-    onError = KediTextPrimary
+private val NeonGatosColorScheme = darkColorScheme(
+    primary          = NeonCoral,
+    onPrimary        = NeonTextPrimary,
+    primaryContainer = NeonCoralLight,
+    onPrimaryContainer = NeonBackground,
+
+    secondary        = NeonFuchsia,
+    onSecondary      = NeonTextPrimary,
+    secondaryContainer = NeonFuchsiaDim,
+    onSecondaryContainer = NeonTextPrimary,
+
+    tertiary         = NeonCyan,
+    onTertiary       = NeonBackground,
+    tertiaryContainer = NeonCyanDim,
+    onTertiaryContainer = NeonBackground,
+
+    background       = NeonBackground,
+    onBackground     = NeonTextPrimary,
+
+    surface          = NeonSurface,
+    onSurface        = NeonTextPrimary,
+    surfaceVariant   = NeonSurfaceHigh,
+    onSurfaceVariant = NeonTextSecondary,
+
+    outline          = NeonSurfaceRim,
+    outlineVariant   = NeonSurfaceHigh,
+
+    error            = NeonError,
+    onError          = NeonTextPrimary,
 )
 
 @Composable
 fun KediBiloTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = KediColorScheme,
-        typography = KediTypography,
-        content = content
+        colorScheme = NeonGatosColorScheme,
+        typography  = KediTypography,
+        content     = content
     )
 }

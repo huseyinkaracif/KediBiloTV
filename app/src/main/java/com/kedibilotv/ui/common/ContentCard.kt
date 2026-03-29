@@ -1,22 +1,36 @@
 package com.kedibilotv.ui.common
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.kedibilotv.R
+import com.kedibilotv.ui.theme.NeonCyan
+import com.kedibilotv.ui.theme.NeonSurface
+import com.kedibilotv.ui.theme.NeonTextPrimary
+import com.kedibilotv.ui.theme.NeonTextSecondary
+
+private val cardShape = RoundedCornerShape(12.dp)
 
 @Composable
 fun ContentCard(
@@ -25,31 +39,64 @@ fun ContentCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    Card(
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.94f else 1f,
+        animationSpec = tween(durationMillis = 100),
+        label = "card_scale"
+    )
+
+    Box(
         modifier = modifier
             .width(140.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            .scale(scale)
+            .clip(cardShape)
+            .background(NeonSurface)
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(
+                    listOf(NeonCyan.copy(alpha = 0.25f), NeonCyan.copy(alpha = 0f))
+                ),
+                shape = cardShape
+            )
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
     ) {
         Column {
-            AsyncImage(
-                model = posterUrl,
-                contentDescription = name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.ic_cat_placeholder),
-                error = painterResource(R.drawable.ic_cat_placeholder)
-            )
+            // Poster
+            Box {
+                AsyncImage(
+                    model = posterUrl,
+                    contentDescription = name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.ic_cat_placeholder),
+                    error = painterResource(R.drawable.ic_cat_placeholder)
+                )
+                // Alt gradient overlay — isim okunabilirliği için
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(NeonSurface.copy(alpha = 0f), NeonSurface.copy(alpha = 0.85f))
+                            )
+                        )
+                )
+            }
+
+            // İsim
             Text(
                 text = name,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelMedium,
+                color = NeonTextPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
             )
         }
     }
