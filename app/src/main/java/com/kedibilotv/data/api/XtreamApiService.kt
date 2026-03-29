@@ -17,15 +17,23 @@ class XtreamApiService @Inject constructor(
     private var password: String = ""
 
     fun configure(serverUrl: String, user: String, pass: String) {
-        baseUrl = serverUrl.trimEnd('/')
-        username = user
-        password = pass
+        var url = serverUrl.trim().trimEnd('/')
+        if (!url.startsWith("http://", ignoreCase = true) && !url.startsWith("https://", ignoreCase = true)) {
+            url = "http://$url"
+        }
+        baseUrl = url
+        username = user.trim()
+        password = pass.trim()
     }
 
     private fun apiUrl(action: String? = null): String {
         val encodedUser = URLEncoder.encode(username, "UTF-8")
         val encodedPass = URLEncoder.encode(password, "UTF-8")
-        val base = "$baseUrl/player_api.php?username=$encodedUser&password=$encodedPass"
+        // Eğer baseUrl zaten bir .php endpoint'i içeriyorsa (get.php gibi) direkt kullan,
+        // aksi halde standart /player_api.php ekle
+        val endpoint = if (baseUrl.contains(".php", ignoreCase = true)) baseUrl
+                       else "$baseUrl/player_api.php"
+        val base = "$endpoint?username=$encodedUser&password=$encodedPass"
         return if (action != null) "$base&action=$action" else base
     }
 
