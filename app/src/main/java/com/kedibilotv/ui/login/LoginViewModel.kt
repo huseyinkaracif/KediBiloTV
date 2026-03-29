@@ -49,6 +49,7 @@ class LoginViewModel @Inject constructor(
                     _state.value = _state.value.copy(isCheckingSaved = false)
                 }
             } catch (e: Exception) {
+                android.util.Log.e("LoginViewModel", "checkSavedConfig Hata:", e)
                 _state.value = _state.value.copy(isCheckingSaved = false)
             }
         }

@@ -7,6 +7,7 @@ import com.kedibilotv.domain.model.ServerConfig
 import com.kedibilotv.domain.repository.AuthRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import javax.net.ssl.SSLException
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
@@ -15,6 +16,10 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     override suspend fun login(serverUrl: String, username: String, password: String): Result<ServerConfig> {
+        return tryLogin(serverUrl, username, password)
+    }
+
+    private suspend fun tryLogin(serverUrl: String, username: String, password: String): Result<ServerConfig> {
         return try {
             api.configure(serverUrl, username, password)
             val response = api.authenticate()
@@ -37,8 +42,17 @@ class AuthRepositoryImpl @Inject constructor(
             ))
 
             Result.success(config)
+        } catch (e: SSLException) {
+            // Sunucu https:// yerine http:// konuşuyor, otomatik düşür
+            if (serverUrl.startsWith("https://", ignoreCase = true)) {
+                val httpUrl = "http://" + serverUrl.removePrefix("https://")
+                tryLogin(httpUrl, username, password)
+            } else {
+                Result.failure(Exception("Sunucuya baglanamadi: ${e.message}"))
+            }
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
+            android.util.Log.e("AuthRepositoryImpl", "Hata oluştu:", e)
             Result.failure(Exception("Sunucuya baglanamadi: ${e.message}"))
         }
     }

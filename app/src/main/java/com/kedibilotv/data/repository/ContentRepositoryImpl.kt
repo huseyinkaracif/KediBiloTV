@@ -27,6 +27,7 @@ class ContentRepositoryImpl @Inject constructor(
             categoryCache[type] = categories
             Result.success(categories)
         } catch (e: Exception) {
+            android.util.Log.e("ContentRepositoryImpl", "Hata oluştu:", e)
             Result.failure(e)
         }
     }
@@ -50,6 +51,7 @@ class ContentRepositoryImpl @Inject constructor(
             contentCache[key] = items
             Result.success(items)
         } catch (e: Exception) {
+            android.util.Log.e("ContentRepositoryImpl", "Hata oluştu:", e)
             Result.failure(e)
         }
     }
@@ -62,6 +64,7 @@ class ContentRepositoryImpl @Inject constructor(
             contentCache["ALL_VOD"] = items
             Result.success(items)
         } catch (e: Exception) {
+            android.util.Log.e("ContentRepositoryImpl", "Hata oluştu:", e)
             Result.failure(e)
         }
     }
@@ -96,6 +99,7 @@ class ContentRepositoryImpl @Inject constructor(
                 seasons = seasons
             ))
         } catch (e: Exception) {
+            android.util.Log.e("ContentRepositoryImpl", "getSeriesInfo Hata oluştu:", e)
             Result.failure(e)
         }
     }
