@@ -119,12 +119,12 @@ app/src/main/java/com/kedibilotv/
 | Xtream Codes API servisi | ✅ Tamamlandı |
 | Repository implementasyonları ve DI | ✅ Tamamlandı |
 | Tema, ortak UI bileşenleri, navigasyon | ✅ Tamamlandı |
-| Login ekranı | 🔄 Devam ediyor |
-| Ana ekran (Home) | ⏳ Bekliyor |
-| Kategori ve içerik listesi | ⏳ Bekliyor |
-| Detay ekranı | ⏳ Bekliyor |
-| Oynatıcı ekranı | ⏳ Bekliyor |
-| Ayarlar ekranı | ⏳ Bekliyor |
+| Login ekranı | ✅ Tamamlandı |
+| Ana ekran (Home) | ✅ Tamamlandı |
+| Kategori ve içerik listesi | ✅ Tamamlandı |
+| Detay ekranı | ✅ Tamamlandı |
+| Oynatıcı ekranı | ✅ Tamamlandı |
+| Ayarlar ekranı | ✅ Tamamlandı |
 
 ## Kapsam Dışı (V1)
 
