@@ -38,6 +38,7 @@ class AuthRepositoryImpl @Inject constructor(
 
             Result.success(config)
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(Exception("Sunucuya baglanamadi: ${e.message}"))
         }
     }

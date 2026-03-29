@@ -4,6 +4,7 @@ import com.kedibilotv.data.api.model.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,7 +23,9 @@ class XtreamApiService @Inject constructor(
     }
 
     private fun apiUrl(action: String? = null): String {
-        val base = "$baseUrl/player_api.php?username=$username&password=$password"
+        val encodedUser = URLEncoder.encode(username, "UTF-8")
+        val encodedPass = URLEncoder.encode(password, "UTF-8")
+        val base = "$baseUrl/player_api.php?username=$encodedUser&password=$encodedPass"
         return if (action != null) "$base&action=$action" else base
     }
 

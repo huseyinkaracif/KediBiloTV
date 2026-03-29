@@ -35,16 +35,20 @@ class LoginViewModel @Inject constructor(
 
     private fun checkSavedLogin() {
         viewModelScope.launch {
-            val config = authRepository.getSavedConfig()
-            if (config != null) {
-                _state.value = _state.value.copy(
-                    serverUrl = config.serverUrl,
-                    username = config.username,
-                    password = config.password,
-                    isLoggedIn = true,
-                    isCheckingSaved = false
-                )
-            } else {
+            try {
+                val config = authRepository.getSavedConfig()
+                if (config != null) {
+                    _state.value = _state.value.copy(
+                        serverUrl = config.serverUrl,
+                        username = config.username,
+                        password = config.password,
+                        isLoggedIn = true,
+                        isCheckingSaved = false
+                    )
+                } else {
+                    _state.value = _state.value.copy(isCheckingSaved = false)
+                }
+            } catch (e: Exception) {
                 _state.value = _state.value.copy(isCheckingSaved = false)
             }
         }

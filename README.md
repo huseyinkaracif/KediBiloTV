@@ -126,16 +126,6 @@ app/src/main/java/com/kedibilotv/
 | Oynatıcı ekranı | ✅ Tamamlandı |
 | Ayarlar ekranı | ✅ Tamamlandı |
 
-## Kapsam Dışı (V1)
-
-Şu an geliştirilmeyecek, ileride eklenebilir:
-- EPG (Elektronik Program Rehberi)
-- Çoklu sunucu / profil yönetimi
-- Offline cache
-- RTMP stream desteği
-- Özel kedi illüstrasyonları
-- Çok dilli destek
-
 ## Lisans
 
 MIT

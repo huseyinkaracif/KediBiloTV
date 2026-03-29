@@ -3,6 +3,7 @@ package com.kedibilotv
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.SideEffect
 import androidx.navigation.compose.rememberNavController
 import com.kedibilotv.data.api.XtreamApiService
 import com.kedibilotv.ui.navigation.KediBiloNavHost
@@ -22,10 +23,12 @@ class MainActivity : ComponentActivity() {
             KediBiloTheme {
                 val navController = rememberNavController()
 
-                apiService.onUnauthorized = {
-                    runOnUiThread {
-                        navController.navigate(NavRoutes.LOGIN) {
-                            popUpTo(0) { inclusive = true }
+                SideEffect {
+                    apiService.onUnauthorized = {
+                        runOnUiThread {
+                            navController.navigate(NavRoutes.LOGIN) {
+                                popUpTo(0) { inclusive = true }
+                            }
                         }
                     }
                 }
