@@ -1,4 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">KediBiloTV</string>
+    <string name="login_title">KediBiloTV\'ye Hos Geldin</string>
+    <string name="server_url">Sunucu URL</string>
+    <string name="username">Kullanici Adi</string>
+    <string name="password">Sifre</string>
+    <string name="connect">Baglan</string>
+    <string name="connecting">Baglaniyor...</string>
+    <string name="live_tv">Canli TV</string>
+    <string name="movies">Filmler</string>
+    <string name="series">Diziler</string>
+    <string name="continue_watching">Devam Et</string>
+    <string name="favorites">Favoriler</string>
+    <string name="search_hint">Ara...</string>
+    <string name="no_favorites">Henuz favori eklemedin</string>
+    <string name="no_results">Sonuc bulunamadi</string>
+    <string name="no_content">Icerik bulunamadi</string>
+    <string name="error_connection">Sunucuya baglanamadi</string>
+    <string name="error_auth">Gecersiz kullanici adi veya sifre</string>
+    <string name="error_expired">Hesabinizin suresi dolmus</string>
+    <string name="error_inactive">Hesap aktif degil</string>
+    <string name="error_stream">Kanal calismiyor</string>
+    <string name="error_no_internet">Baglanti yok</string>
+    <string name="retry">Tekrar Dene</string>
+    <string name="play">Oynat</string>
+    <string name="continue_play">Devam Et</string>
+    <string name="add_favorite">Favorilere Ekle</string>
+    <string name="remove_favorite">Favorilerden Cikar</string>
+    <string name="settings">Ayarlar</string>
+    <string name="logout">Cikis Yap</string>
+    <string name="buffer_low">Dusuk</string>
+    <string name="buffer_medium">Orta</string>
+    <string name="buffer_high">Yuksek</string>
+    <string name="buffer_size">Buffer Boyutu</string>
+    <string name="season_label">Sezon %d</string>
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="kedi_orange">#FFFF8C00</color>
+    <color name="kedi_background">#FF0D1117</color>
+    <color name="kedi_surface">#FF1A1A2E</color>
+</resources>
