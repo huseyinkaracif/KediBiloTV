@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.kedibilotv"
+    namespace = "com.keditv"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.kedibilotv"
+        applicationId = "com.keditv"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

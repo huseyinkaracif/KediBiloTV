@@ -518,7 +518,7 @@ private fun FloatingTopBar(onSettingsClick: () -> Unit) {
     ) {
         Column {
             Text(
-                text = "KediBilo",
+                text = "Kedi",
                 style = MaterialTheme.typography.headlineSmall,
                 color = NeonCoral
             )

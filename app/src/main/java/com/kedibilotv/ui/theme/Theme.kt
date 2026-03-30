@@ -36,7 +36,7 @@ private val NeonGatosColorScheme = darkColorScheme(
 )
 
 @Composable
-fun KediBiloTheme(content: @Composable () -> Unit) {
+fun KediTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = NeonGatosColorScheme,
         typography  = KediTypography,

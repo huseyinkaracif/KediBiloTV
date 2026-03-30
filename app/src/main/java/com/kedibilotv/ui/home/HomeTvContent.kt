@@ -59,7 +59,7 @@ fun HomeTvContent(
         }
 
         item {
-            Text("Kategoriler", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.categories), style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(8.dp))
             TvLazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 item {

@@ -14,6 +14,10 @@
     <string name="favorites">Favoriler</string>
     <string name="search_hint">Ara...</string>
     <string name="search_categories">Kategori ara...</string>
+    <string name="search">Ara</string>
+    <string name="search_close">Aramayı Kapat</string>
+    <string name="back">Geri</string>
+    <string name="categories">Kategoriler</string>
     <string name="no_favorites">Henuz favori eklemedin</string>
     <string name="no_results">Sonuc bulunamadi</string>
     <string name="no_content">Icerik bulunamadi</string>

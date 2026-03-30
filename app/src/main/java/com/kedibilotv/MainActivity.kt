@@ -8,7 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.kedibilotv.data.api.XtreamApiService
 import com.kedibilotv.ui.navigation.KediBiloNavHost
 import com.kedibilotv.ui.navigation.NavRoutes
-import com.kedibilotv.ui.theme.KediBiloTheme
+import com.kedibilotv.ui.theme.KediTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            KediBiloTheme {
+            KediTheme {
                 val navController = rememberNavController()
 
                 SideEffect {

@@ -17,7 +17,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.KediBiloTV"
+        android:theme="@style/Theme.KediTV"
         android:usesCleartextTraffic="true">
 
         <!-- Mobile launcher -->
@@ -25,7 +25,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
-            android:theme="@style/Theme.KediBiloTV">
+            android:theme="@style/Theme.KediTV">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -76,7 +76,7 @@ fun DetailScreen(
                 ) {
                     Icon(
                         Icons.Default.ArrowBack,
-                        contentDescription = "Geri",
+                        contentDescription = stringResource(R.string.back),
                         tint = NeonTextPrimary,
                         modifier = Modifier.size(20.dp)
                     )

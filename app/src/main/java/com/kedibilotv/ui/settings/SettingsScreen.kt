@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kedibilotv.R
+import com.kedibilotv.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,39 +28,72 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.settings)) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Geri") } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text(stringResource(R.string.settings), color = NeonTextPrimary) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = NeonTextPrimary)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonBackground)
             )
-        }
+        },
+        containerColor = NeonBackground
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("KediBiloTV v1.0.0", style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = "KediTV v1.0.0",
+                style = MaterialTheme.typography.titleMedium,
+                color = NeonTextSecondary
+            )
 
-            Divider()
+            HorizontalDivider(color = NeonSurfaceRim)
 
-            Text(stringResource(R.string.buffer_size), style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = stringResource(R.string.buffer_size),
+                style = MaterialTheme.typography.titleMedium,
+                color = NeonTextPrimary
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 BufferSize.entries.forEach { size ->
+                    val selected = state.bufferSize == size
                     FilterChip(
-                        selected = state.bufferSize == size,
+                        selected = selected,
                         onClick = { viewModel.setBufferSize(size) },
-                        label = { Text(size.label) }
+                        label = { Text(size.label) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = NeonCoral.copy(alpha = 0.15f),
+                            selectedLabelColor = NeonCoral,
+                            containerColor = NeonSurface,
+                            labelColor = NeonTextSecondary
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = selected,
+                            borderColor = NeonSurfaceRim,
+                            selectedBorderColor = NeonCoral.copy(alpha = 0.5f)
+                        )
                     )
                 }
             }
 
-            Divider()
+            HorizontalDivider(color = NeonSurfaceRim)
 
             Button(
                 onClick = viewModel::logout,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                colors = ButtonDefaults.buttonColors(containerColor = NeonError.copy(alpha = 0.12f)),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text(stringResource(R.string.logout))
+                Text(
+                    text = stringResource(R.string.logout),
+                    color = NeonError
+                )
             }
         }
     }

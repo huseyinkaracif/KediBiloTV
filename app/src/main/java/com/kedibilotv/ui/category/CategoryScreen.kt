@@ -2,15 +2,14 @@ package com.kedibilotv.ui.category
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -28,17 +27,19 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kedibilotv.R
 import com.kedibilotv.domain.model.ContentType
 import com.kedibilotv.ui.common.EmptyState
 import com.kedibilotv.ui.common.ErrorState
@@ -58,9 +59,9 @@ fun CategoryScreen(
     val focusManager = LocalFocusManager.current
 
     val title = when (state.contentType) {
-        ContentType.LIVE -> "Canlı TV"
-        ContentType.VOD -> "Filmler"
-        ContentType.SERIES -> "Diziler"
+        ContentType.LIVE -> stringResource(R.string.live_tv)
+        ContentType.VOD -> stringResource(R.string.movies)
+        ContentType.SERIES -> stringResource(R.string.series)
     }
 
     LaunchedEffect(searchVisible) {
@@ -78,7 +79,7 @@ fun CategoryScreen(
                         TextField(
                             value = state.searchQuery,
                             onValueChange = viewModel::search,
-                            placeholder = { Text("Kategori ara...", color = NeonTextMuted) },
+                            placeholder = { Text(stringResource(R.string.search_categories), color = NeonTextMuted) },
                             singleLine = true,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -99,7 +100,7 @@ fun CategoryScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Geri", tint = NeonTextPrimary)
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = NeonTextPrimary)
                     }
                 },
                 actions = {
@@ -109,7 +110,7 @@ fun CategoryScreen(
                     }) {
                         Icon(
                             if (searchVisible) Icons.Default.Close else Icons.Default.Search,
-                            contentDescription = if (searchVisible) "Aramayı Kapat" else "Ara",
+                            contentDescription = if (searchVisible) stringResource(R.string.search_close) else stringResource(R.string.search),
                             tint = if (searchVisible) NeonCoral else NeonCyan
                         )
                     }
@@ -123,8 +124,10 @@ fun CategoryScreen(
             state.isLoading -> LoadingIndicator()
             state.error != null -> ErrorState(state.error!!, viewModel::retry)
             state.filteredCategories.isEmpty() -> EmptyState(
-                if (state.searchQuery.isNotBlank()) "\"${state.searchQuery}\" için sonuç yok"
-                else "Kategori bulunamadı"
+                if (state.searchQuery.isNotBlank())
+                    "\"${state.searchQuery}\" ${stringResource(R.string.no_results)}"
+                else
+                    stringResource(R.string.no_content)
             )
             else -> {
                 var gridVisible by remember { mutableStateOf(false) }
