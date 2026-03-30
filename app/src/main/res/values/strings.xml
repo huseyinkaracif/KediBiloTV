@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KediBiloTV</string>
-    <string name="login_title">KediBiloTV\'ye Hos Geldin</string>
+    <string name="app_name">KediTV</string>
+    <string name="login_title">KediTV\'ye Hos Geldin</string>
     <string name="server_url">Sunucu URL</string>
     <string name="username">Kullanici Adi</string>
     <string name="password">Sifre</string>

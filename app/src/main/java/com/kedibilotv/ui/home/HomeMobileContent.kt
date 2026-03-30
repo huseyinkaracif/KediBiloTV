@@ -1,8 +1,12 @@
 package com.kedibilotv.ui.home
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,11 +23,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.offset
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,6 +41,7 @@ import com.kedibilotv.domain.model.ContentType
 import com.kedibilotv.domain.model.WatchHistory
 import com.kedibilotv.ui.common.ContentCard
 import com.kedibilotv.ui.theme.*
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeMobileContent(
@@ -43,6 +51,37 @@ fun HomeMobileContent(
     onContinueClick: (String, Int, Int?) -> Unit,
     onSettingsClick: () -> Unit
 ) {
+    // Staggered entrance state
+    var tabsVisible by remember { mutableStateOf(false) }
+    var sectionsVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(250)
+        tabsVisible = true
+        delay(180)
+        sectionsVisible = true
+    }
+
+    val tabsAlpha by animateFloatAsState(
+        if (tabsVisible) 1f else 0f,
+        tween(400, easing = FastOutSlowInEasing),
+        label = "tabs_alpha"
+    )
+    val tabsSlide by animateFloatAsState(
+        if (tabsVisible) 0f else 24f,
+        tween(400, easing = FastOutSlowInEasing),
+        label = "tabs_slide"
+    )
+    val sectionsAlpha by animateFloatAsState(
+        if (sectionsVisible) 1f else 0f,
+        tween(500, easing = FastOutSlowInEasing),
+        label = "sections_alpha"
+    )
+    val sectionsSlide by animateFloatAsState(
+        if (sectionsVisible) 0f else 20f,
+        tween(500, easing = FastOutSlowInEasing),
+        label = "sections_slide"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -62,33 +101,52 @@ fun HomeMobileContent(
                     )
                 }
             } else {
-                // Boş hero yerine başlık alanı bırak (floating header için)
                 item { Spacer(Modifier.height(80.dp)) }
             }
 
-            // İçerik türü sekmeleri
+            // İçerik türü sekmeleri — slide in from below
             item {
-                ContentTypeTabs(onCategoryClick = onCategoryClick)
+                Box(
+                    modifier = Modifier
+                        .alpha(tabsAlpha)
+                        .offset(y = tabsSlide.dp)
+                ) {
+                    ContentTypeTabs(onCategoryClick = onCategoryClick)
+                }
             }
 
             // Devam Et
             if (state.continueWatching.isNotEmpty()) {
                 item {
-                    SectionHeader(
-                        title = stringResource(R.string.continue_watching),
-                        icon = Icons.Default.PlayArrow
-                    )
+                    Box(
+                        modifier = Modifier
+                            .alpha(sectionsAlpha)
+                            .offset(y = sectionsSlide.dp)
+                    ) {
+                        SectionHeader(
+                            title = stringResource(R.string.continue_watching),
+                            icon = Icons.Default.PlayArrow
+                        )
+                    }
                 }
                 item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    Box(
+                        modifier = Modifier
+                            .alpha(sectionsAlpha)
+                            .offset(y = sectionsSlide.dp)
                     ) {
-                        items(state.continueWatching) { history ->
-                            ContinueWatchingCard(
-                                history = history,
-                                onClick = { onContinueClick(history.type.name, history.streamId, history.episodeId) }
-                            )
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(state.continueWatching) { history ->
+                                ContinueWatchingCard(
+                                    history = history,
+                                    onClick = {
+                                        onContinueClick(history.type.name, history.streamId, history.episodeId)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -98,22 +156,31 @@ fun HomeMobileContent(
             // Favoriler
             if (state.favorites.isNotEmpty()) {
                 item {
-                    SectionHeader(
-                        title = stringResource(R.string.favorites),
-                        icon = null
-                    )
+                    Box(
+                        modifier = Modifier
+                            .alpha(sectionsAlpha)
+                            .offset(y = sectionsSlide.dp)
+                    ) {
+                        SectionHeader(title = stringResource(R.string.favorites), icon = null)
+                    }
                 }
                 item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    Box(
+                        modifier = Modifier
+                            .alpha(sectionsAlpha)
+                            .offset(y = sectionsSlide.dp)
                     ) {
-                        items(state.favorites) { fav ->
-                            ContentCard(
-                                name = fav.name,
-                                posterUrl = fav.posterUrl,
-                                onClick = { onItemClick(fav.type.name, fav.streamId) }
-                            )
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(state.favorites) { fav ->
+                                ContentCard(
+                                    name = fav.name,
+                                    posterUrl = fav.posterUrl,
+                                    onClick = { onItemClick(fav.type.name, fav.streamId) }
+                                )
+                            }
                         }
                     }
                 }
@@ -129,7 +196,7 @@ fun HomeMobileContent(
 }
 
 // ─────────────────────────────────────────────────────────────────
-// Hero Banner
+// Hero Banner — AnimatedContent crossfade between featured items
 // ─────────────────────────────────────────────────────────────────
 
 @Composable
@@ -138,113 +205,122 @@ private fun HeroBanner(
     currentIndex: Int,
     onPlayClick: (ContentItem) -> Unit
 ) {
-    val featured = items[currentIndex.coerceIn(0, items.lastIndex)]
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(420.dp)
     ) {
-        // Arka plan görseli
-        AsyncImage(
-            model = featured.posterUrl,
-            contentDescription = featured.name,
+        // Crossfading background + content
+        AnimatedContent(
+            targetState = currentIndex,
+            transitionSpec = {
+                (fadeIn(tween(700)) + scaleIn(tween(700), initialScale = 1.04f)) togetherWith
+                        fadeOut(tween(450))
+            },
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+            label = "hero_content"
+        ) { idx ->
+            val featured = items[idx.coerceIn(0, items.lastIndex)]
+            Box(Modifier.fillMaxSize()) {
+                AsyncImage(
+                    model = featured.posterUrl,
+                    contentDescription = featured.name,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
 
-        // Üst karartma — floating header okunabilirliği
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .align(Alignment.TopCenter)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(NeonBackground.copy(alpha = 0.85f), Color.Transparent)
+                // Üst karartma — floating header okunabilirliği
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .align(Alignment.TopCenter)
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(NeonBackground.copy(alpha = 0.85f), Color.Transparent)
+                            )
+                        )
+                )
+
+                // Alt karartma — içerik bilgisi
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(260.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(Color.Transparent, NeonBackground.copy(alpha = 0.97f))
+                            )
+                        )
+                )
+
+                // İçerik bilgisi
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(horizontal = 20.dp, vertical = 20.dp)
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = NeonCoral.copy(alpha = 0.15f),
+                        modifier = Modifier.border(
+                            1.dp, NeonCoral.copy(alpha = 0.5f), RoundedCornerShape(4.dp)
+                        )
+                    ) {
+                        Text(
+                            text = "ÖNE ÇIKAN",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = NeonCoral,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Text(
+                        text = featured.name,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = NeonTextPrimary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
-                )
-        )
 
-        // Alt karartma — içerik bilgisi
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(260.dp)
-                .align(Alignment.BottomCenter)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color.Transparent, NeonBackground.copy(alpha = 0.97f))
-                    )
-                )
-        )
+                    if (!featured.rating.isNullOrBlank() && featured.rating != "0") {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "★ ${featured.rating}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = NeonCyan
+                        )
+                    }
 
-        // İçerik bilgisi
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(horizontal = 20.dp, vertical = 20.dp)
-        ) {
-            // İçerik türü etiketi
-            Surface(
-                shape = RoundedCornerShape(4.dp),
-                color = NeonCoral.copy(alpha = 0.15f),
-                modifier = Modifier.border(1.dp, NeonCoral.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
-            ) {
-                Text(
-                    text = "ÖNE ÇIKAN",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = NeonCoral,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                )
-            }
+                    Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(8.dp))
-
-            // Başlık
-            Text(
-                text = featured.name,
-                style = MaterialTheme.typography.headlineMedium,
-                color = NeonTextPrimary,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            // Puan
-            if (!featured.rating.isNullOrBlank() && featured.rating != "0") {
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "★ ${featured.rating}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = NeonCyan
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Oynat butonu
-            Button(
-                onClick = { onPlayClick(featured) },
-                colors = ButtonDefaults.buttonColors(containerColor = NeonCoral),
-                shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
-            ) {
-                Icon(
-                    Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = NeonTextPrimary
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = stringResource(R.string.play),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = NeonTextPrimary
-                )
+                    Button(
+                        onClick = { onPlayClick(featured) },
+                        colors = ButtonDefaults.buttonColors(containerColor = NeonCoral),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = NeonTextPrimary
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.play),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = NeonTextPrimary
+                        )
+                    }
+                }
             }
         }
 
-        // Carousel nokta göstergeleri
+        // Carousel nokta göstergeleri — AnimatedContent dışında, her zaman görünür
         if (items.size > 1) {
             Row(
                 modifier = Modifier
@@ -254,11 +330,22 @@ private fun HeroBanner(
             ) {
                 items.forEachIndexed { idx, _ ->
                     val isActive = idx == currentIndex
+                    val dotWidth by animateFloatAsState(
+                        targetValue = if (isActive) 20f else 6f,
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        label = "dot_width_$idx"
+                    )
+                    val dotAlpha by animateFloatAsState(
+                        targetValue = if (isActive) 1f else 0.4f,
+                        animationSpec = tween(300),
+                        label = "dot_alpha_$idx"
+                    )
                     Box(
                         modifier = Modifier
-                            .width(if (isActive) 20.dp else 6.dp)
+                            .width(dotWidth.dp)
                             .height(6.dp)
                             .clip(CircleShape)
+                            .alpha(dotAlpha)
                             .background(if (isActive) NeonCoral else NeonTextMuted)
                     )
                 }
@@ -311,9 +398,21 @@ private fun ContentTypeTab(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.91f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "tab_scale"
+    )
+
     Box(
         modifier = modifier
             .height(72.dp)
+            .scale(scale)
             .clip(RoundedCornerShape(12.dp))
             .background(NeonSurface)
             .border(
@@ -321,7 +420,11 @@ private fun ContentTypeTab(
                 color = accentColor.copy(alpha = 0.35f),
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable(onClick = onClick),
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
         contentAlignment = Alignment.Center
     ) {
         Column(
