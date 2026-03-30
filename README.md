@@ -1,131 +1,117 @@
-# 🐱 KediBiloTV
+# KediBiloTV
 
-Netflix benzeri, kedi temalı Android IPTV uygulaması. Android TV, telefon ve tablet destekler.
+A Netflix-style, cat-themed Android IPTV application supporting Android TV, phones, and tablets.
 
-## Özellikler
+**Built by Hüseyin Karacif**
 
-- **Xtream Codes API** desteği ile Canlı TV, Film ve Dizi içerikleri
-- **Devam et** — Kapattığın yerden kaldığın yerden izlemeye devam
-- **Favoriler** — İstediğin içerikleri kaydet
-- **Kedi teması** — Neşeli, renkli ve sinema tadında arayüz
-- **Düşük kaynak kullanımı** — 2GB RAM cihazlarda sorunsuz çalışır
-- **TV + Mobil** — Tek APK, runtime'da platform algılanır
+---
 
-## Kurulum
+## Features
 
-### Gereksinimler
+- **Live TV, Movies & Series** via Xtream Codes API
+- **Netflix-style Home** — auto-rotating hero banner, content type tabs with icons
+- **Continue Watching** — resume with progress bar indicator
+- **Favorites** — save any content for quick access
+- **Category Search** — search/filter categories by name in real time
+- **Dual Platform** — single APK, runtime platform detection (TV / mobile)
+- **Neon Gatos Cinema** design — bold, cinematic, cat-energy UI
+- **Low resource usage** — runs smoothly on 2GB RAM devices
 
-- Android Studio Hedgehog veya üstü
-- JDK 17
-- Android SDK 34
-- minSdk 24
+---
 
-### Projeyi Klonla
+## Tech Stack
 
-```bash
-git clone https://github.com/KULLANICI_ADI/KediBiloTV.git
-cd KediBiloTV
-```
-
-### Build
-
-```bash
-./gradlew assembleDebug
-```
-
-APK: `app/build/outputs/apk/debug/app-debug.apk`
-
-### Test
-
-```bash
-# Unit testler
-./gradlew test
-
-# Instrumented testler (bağlı cihaz gerekli)
-./gradlew connectedAndroidTest
-```
-
-## Kullanım
-
-1. Uygulamayı aç
-2. Xtream Codes sunucu bilgilerini gir:
-   - **Sunucu URL** — Örnek: `http://sunucu.com:8080`
-   - **Kullanıcı Adı**
-   - **Şifre**
-3. "Bağlan" butonuna bas
-4. Canlı TV, Filmler veya Diziler kategorilerini seç
-
-## Teknoloji Stack
-
-| Bileşen | Teknoloji |
-|---------|-----------|
-| Dil | Kotlin |
-| UI (Mobil) | Jetpack Compose + Material3 |
-| UI (TV) | Compose TV |
-| Navigasyon | Compose Navigation |
-| Video Oynatıcı | Media3 / ExoPlayer |
-| Veritabanı | Room |
-| Ağ | Ktor Client |
-| DI | Hilt |
-| Resim Yükleme | Coil |
+| Layer | Technology |
+|---|---|
+| Language | Kotlin |
+| UI — Mobile | Jetpack Compose + Material 3 |
+| UI — TV | Compose TV (androidx.tv) |
+| Navigation | Compose Navigation |
+| Video Player | Media3 / ExoPlayer |
+| Database | Room |
+| Networking | Ktor Client (OkHttp engine) |
+| Dependency Injection | Hilt |
+| Image Loading | Coil |
 | Async | Coroutines + Flow |
+| Architecture | Clean Architecture — UseCase → Repository → ViewModel → Screen |
 
-## Proje Yapısı
+---
+
+## Project Structure
 
 ```
 app/src/main/java/com/kedibilotv/
 ├── data/
-│   ├── api/          # Xtream Codes API servisi ve DTO'lar
-│   ├── db/           # Room veritabanı, entity'ler, DAO'lar
-│   └── repository/   # Repository implementasyonları
+│   ├── api/          # Xtream Codes API service and DTOs
+│   ├── db/           # Room database, entities, DAOs
+│   └── repository/   # Repository implementations
 ├── domain/
-│   ├── model/        # Domain modelleri
-│   ├── repository/   # Repository arayüzleri
-│   └── usecase/      # İş mantığı use case'leri
+│   ├── model/        # Domain models
+│   ├── repository/   # Repository interfaces
+│   └── usecase/      # Business logic use cases
 ├── ui/
-│   ├── common/       # Paylaşılan UI bileşenleri
-│   ├── theme/        # KediBilo teması, renkler, tipografi
-│   ├── navigation/   # NavHost ve route tanımları
-│   ├── login/        # Giriş ekranı
-│   ├── home/         # Ana ekran (TV + Mobil)
-│   ├── category/     # Kategori listesi
-│   ├── content/      # İçerik listesi + arama
-│   ├── detail/       # Film/Dizi detay ekranı
-│   ├── player/       # Video oynatıcı
-│   └── settings/     # Ayarlar
+│   ├── common/       # Shared UI components
+│   ├── theme/        # KediBilo theme, colors, typography
+│   ├── navigation/   # NavHost and route definitions
+│   ├── login/        # Login screen
+│   ├── home/         # Home screen (TV + Mobile)
+│   ├── category/     # Category list
+│   ├── content/      # Content list + search
+│   ├── detail/       # Movie / Series detail screen
+│   ├── player/       # Video player screen
+│   └── settings/     # Settings screen
 ├── player/           # Media3 player wrapper
-└── di/               # Hilt DI modülleri
+└── di/               # Hilt DI modules
 ```
 
-## Uygulama İçi Ekranlar
+---
 
-| Ekran | Açıklama |
-|-------|----------|
-| Login | Sunucu bağlantı bilgileri girişi |
-| Home | Banner, Devam Et, Favoriler, Kategoriler |
-| Category | Alt kategori grid görünümü |
-| Content List | Poster kartları + anlık arama filtresi |
-| Detail | Film/Dizi bilgisi, sezon/bölüm seçici, favori toggle |
-| Player | Tam ekran Media3 oynatıcı, D-pad + gesture kontrolü |
-| Settings | Buffer boyutu, çıkış |
+## Screens
 
-## Geliştirme Durumu
+| Screen | Description |
+|---|---|
+| Login | Server connection credentials input |
+| Home | Netflix-style hero banner, content type tabs (Live/Movies/Series with icons), Continue Watching with progress bars, Favorites |
+| Category | Sub-category grid + live search filter (search icon in top bar) |
+| Content List | Poster cards + live search filter |
+| Detail | Movie/Series info, season/episode selector, favorite toggle |
+| Player | Fullscreen Media3 player, D-pad + gesture controls |
+| Settings | Buffer size, sign out |
 
-| Task | Durum |
-|------|-------|
-| Proje altyapısı (Gradle, Manifest) | ✅ Tamamlandı |
-| Domain modelleri ve repository arayüzleri | ✅ Tamamlandı |
-| Room veritabanı (Favoriler, Geçmiş, Sunucu) | ✅ Tamamlandı |
-| Xtream Codes API servisi | ✅ Tamamlandı |
-| Repository implementasyonları ve DI | ✅ Tamamlandı |
-| Tema, ortak UI bileşenleri, navigasyon | ✅ Tamamlandı |
-| Login ekranı | ✅ Tamamlandı |
-| Ana ekran (Home) | ✅ Tamamlandı |
-| Kategori ve içerik listesi | ✅ Tamamlandı |
-| Detay ekranı | ✅ Tamamlandı |
-| Oynatıcı ekranı | ✅ Tamamlandı |
-| Ayarlar ekranı | ✅ Tamamlandı |
+---
 
-## Lisans
+## Requirements
 
-MIT
+- Android Studio Hedgehog or later
+- JDK 17
+- Android SDK 34
+- minSdk 24
+
+---
+
+## Getting Started
+
+```bash
+git clone https://github.com/huseyinkaracif/KediBiloTV.git
+cd KediBiloTV
+./gradlew assembleDebug
+```
+
+APK output: `app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+## Usage
+
+1. Open the app
+2. Enter your Xtream Codes server credentials:
+   - **Server URL** — e.g. `http://server.com:8080`
+   - **Username**
+   - **Password**
+3. Tap **Connect**
+4. Browse Live TV, Movies, or Series
+
+
+## License
+
+MIT © Hüseyin Karacif

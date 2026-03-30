@@ -16,6 +16,8 @@ data class CategoryUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val categories: List<Category> = emptyList(),
+    val filteredCategories: List<Category> = emptyList(),
+    val searchQuery: String = "",
     val contentType: ContentType = ContentType.LIVE
 )
 
@@ -35,10 +37,23 @@ class CategoryViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             getCategoriesUseCase(type).fold(
-                onSuccess = { _state.value = _state.value.copy(isLoading = false, categories = it, error = null) },
+                onSuccess = {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        categories = it,
+                        filteredCategories = it,
+                        error = null
+                    )
+                },
                 onFailure = { _state.value = _state.value.copy(isLoading = false, error = it.message) }
             )
         }
+    }
+
+    fun search(query: String) {
+        val filtered = if (query.isBlank()) _state.value.categories
+        else _state.value.categories.filter { it.name.contains(query, ignoreCase = true) }
+        _state.value = _state.value.copy(searchQuery = query, filteredCategories = filtered)
     }
 
     fun retry() = loadCategories()

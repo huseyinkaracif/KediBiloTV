@@ -1,27 +1,40 @@
 package com.kedibilotv.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LiveTv
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.kedibilotv.R
+import com.kedibilotv.domain.model.ContentItem
 import com.kedibilotv.domain.model.ContentType
+import com.kedibilotv.domain.model.WatchHistory
 import com.kedibilotv.ui.common.ContentCard
+import com.kedibilotv.ui.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeMobileContent(
     state: HomeUiState,
@@ -30,112 +43,403 @@ fun HomeMobileContent(
     onContinueClick: (String, Int, Int?) -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("KediBiloTV", style = MaterialTheme.typography.headlineMedium) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(NeonBackground)
+    ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
+            // Hero banner
             if (state.featuredItems.isNotEmpty()) {
                 item {
-                    val featured = state.featuredItems[state.currentFeaturedIndex]
-                    AsyncImage(
-                        model = featured.posterUrl,
-                        contentDescription = featured.name,
+                    HeroBanner(
+                        items = state.featuredItems,
+                        currentIndex = state.currentFeaturedIndex,
+                        onPlayClick = { item -> onItemClick(item.type.name, item.streamId) }
+                    )
+                }
+            } else {
+                // Boş hero yerine başlık alanı bırak (floating header için)
+                item { Spacer(Modifier.height(80.dp)) }
+            }
+
+            // İçerik türü sekmeleri
+            item {
+                ContentTypeTabs(onCategoryClick = onCategoryClick)
+            }
+
+            // Devam Et
+            if (state.continueWatching.isNotEmpty()) {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.continue_watching),
+                        icon = Icons.Default.PlayArrow
+                    )
+                }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.continueWatching) { history ->
+                            ContinueWatchingCard(
+                                history = history,
+                                onClick = { onContinueClick(history.type.name, history.streamId, history.episodeId) }
+                            )
+                        }
+                    }
+                }
+                item { Spacer(Modifier.height(8.dp)) }
+            }
+
+            // Favoriler
+            if (state.favorites.isNotEmpty()) {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.favorites),
+                        icon = null
+                    )
+                }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.favorites) { fav ->
+                            ContentCard(
+                                name = fav.name,
+                                posterUrl = fav.posterUrl,
+                                onClick = { onItemClick(fav.type.name, fav.streamId) }
+                            )
+                        }
+                    }
+                }
+                item { Spacer(Modifier.height(8.dp)) }
+            }
+
+            item { Spacer(Modifier.height(40.dp)) }
+        }
+
+        // Floating top bar — hero üzerine bindiriliyor
+        FloatingTopBar(onSettingsClick = onSettingsClick)
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Hero Banner
+// ─────────────────────────────────────────────────────────────────
+
+@Composable
+private fun HeroBanner(
+    items: List<ContentItem>,
+    currentIndex: Int,
+    onPlayClick: (ContentItem) -> Unit
+) {
+    val featured = items[currentIndex.coerceIn(0, items.lastIndex)]
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(420.dp)
+    ) {
+        // Arka plan görseli
+        AsyncImage(
+            model = featured.posterUrl,
+            contentDescription = featured.name,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // Üst karartma — floating header okunabilirliği
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .align(Alignment.TopCenter)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(NeonBackground.copy(alpha = 0.85f), Color.Transparent)
+                    )
+                )
+        )
+
+        // Alt karartma — içerik bilgisi
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(260.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color.Transparent, NeonBackground.copy(alpha = 0.97f))
+                    )
+                )
+        )
+
+        // İçerik bilgisi
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(horizontal = 20.dp, vertical = 20.dp)
+        ) {
+            // İçerik türü etiketi
+            Surface(
+                shape = RoundedCornerShape(4.dp),
+                color = NeonCoral.copy(alpha = 0.15f),
+                modifier = Modifier.border(1.dp, NeonCoral.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+            ) {
+                Text(
+                    text = "ÖNE ÇIKAN",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = NeonCoral,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Başlık
+            Text(
+                text = featured.name,
+                style = MaterialTheme.typography.headlineMedium,
+                color = NeonTextPrimary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            // Puan
+            if (!featured.rating.isNullOrBlank() && featured.rating != "0") {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "★ ${featured.rating}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = NeonCyan
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Oynat butonu
+            Button(
+                onClick = { onPlayClick(featured) },
+                colors = ButtonDefaults.buttonColors(containerColor = NeonCoral),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+            ) {
+                Icon(
+                    Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = NeonTextPrimary
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = stringResource(R.string.play),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = NeonTextPrimary
+                )
+            }
+        }
+
+        // Carousel nokta göstergeleri
+        if (items.size > 1) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 20.dp, bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                items.forEachIndexed { idx, _ ->
+                    val isActive = idx == currentIndex
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(horizontal = 16.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable { onItemClick(featured.type.name, featured.streamId) },
-                        contentScale = ContentScale.Crop
+                            .width(if (isActive) 20.dp else 6.dp)
+                            .height(6.dp)
+                            .clip(CircleShape)
+                            .background(if (isActive) NeonCoral else NeonTextMuted)
                     )
                 }
             }
-
-            if (state.continueWatching.isNotEmpty()) {
-                item {
-                    SectionHeader(stringResource(R.string.continue_watching))
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(state.continueWatching) { item ->
-                            ContentCard(
-                                name = item.episodeTitle ?: item.name,
-                                posterUrl = item.posterUrl,
-                                onClick = { onContinueClick(item.type.name, item.streamId, item.episodeId) }
-                            )
-                        }
-                    }
-                }
-            }
-
-            if (state.favorites.isNotEmpty()) {
-                item {
-                    SectionHeader(stringResource(R.string.favorites))
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(state.favorites) { item ->
-                            ContentCard(
-                                name = item.name,
-                                posterUrl = item.posterUrl,
-                                onClick = { onItemClick(item.type.name, item.streamId) }
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                SectionHeader("Kategoriler")
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    CategoryButton(stringResource(R.string.live_tv), Modifier.weight(1f)) { onCategoryClick(ContentType.LIVE.name) }
-                    CategoryButton(stringResource(R.string.movies), Modifier.weight(1f)) { onCategoryClick(ContentType.VOD.name) }
-                    CategoryButton(stringResource(R.string.series), Modifier.weight(1f)) { onCategoryClick(ContentType.SERIES.name) }
-                }
-            }
-
-            item { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// İçerik Türü Sekmeleri
+// ─────────────────────────────────────────────────────────────────
+
 @Composable
-private fun SectionHeader(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleLarge,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-    )
+private fun ContentTypeTabs(onCategoryClick: (String) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        ContentTypeTab(
+            icon = Icons.Default.LiveTv,
+            label = stringResource(R.string.live_tv),
+            accentColor = NeonFuchsia,
+            modifier = Modifier.weight(1f),
+            onClick = { onCategoryClick(ContentType.LIVE.name) }
+        )
+        ContentTypeTab(
+            icon = Icons.Default.Movie,
+            label = stringResource(R.string.movies),
+            accentColor = NeonCoral,
+            modifier = Modifier.weight(1f),
+            onClick = { onCategoryClick(ContentType.VOD.name) }
+        )
+        ContentTypeTab(
+            icon = Icons.Default.VideoLibrary,
+            label = stringResource(R.string.series),
+            accentColor = NeonCyan,
+            modifier = Modifier.weight(1f),
+            onClick = { onCategoryClick(ContentType.SERIES.name) }
+        )
+    }
 }
 
 @Composable
-private fun CategoryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(56.dp),
-        shape = RoundedCornerShape(12.dp)
+private fun ContentTypeTab(
+    icon: ImageVector,
+    label: String,
+    accentColor: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .height(72.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(NeonSurface)
+            .border(
+                width = 1.dp,
+                color = accentColor.copy(alpha = 0.35f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
-        Text(text, style = MaterialTheme.typography.labelLarge)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = accentColor,
+                modifier = Modifier.size(22.dp)
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = NeonTextPrimary
+            )
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Devam Et Kartı (progress bar ile)
+// ─────────────────────────────────────────────────────────────────
+
+@Composable
+private fun ContinueWatchingCard(history: WatchHistory, onClick: () -> Unit) {
+    val progress = if (history.durationMs > 0) {
+        (history.positionMs.toFloat() / history.durationMs.toFloat()).coerceIn(0f, 1f)
+    } else null
+
+    val displayName = history.name.takeIf { it.isNotBlank() } ?: "İsimsiz"
+    val subtitle = history.episodeTitle?.takeIf { it.isNotBlank() }
+
+    ContentCard(
+        name = displayName,
+        posterUrl = history.posterUrl?.takeIf { it.isNotBlank() },
+        progress = progress,
+        subtitle = subtitle,
+        onClick = onClick
+    )
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Bölüm Başlığı
+// ─────────────────────────────────────────────────────────────────
+
+@Composable
+private fun SectionHeader(title: String, icon: ImageVector?) {
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = NeonCoral,
+                modifier = Modifier.size(18.dp)
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .height(18.dp)
+                    .background(NeonFuchsia, RoundedCornerShape(2.dp))
+            )
+        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = NeonTextPrimary
+        )
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Floating Top Bar
+// ─────────────────────────────────────────────────────────────────
+
+@Composable
+private fun FloatingTopBar(onSettingsClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = "KediBilo",
+                style = MaterialTheme.typography.headlineSmall,
+                color = NeonCoral
+            )
+            Text(
+                text = "TV",
+                style = MaterialTheme.typography.labelSmall,
+                color = NeonCyan,
+                modifier = Modifier.offset(y = (-4).dp)
+            )
+        }
+
+        IconButton(
+            onClick = onSettingsClick,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(NeonSurface.copy(alpha = 0.8f))
+        ) {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = stringResource(R.string.settings),
+                tint = NeonTextSecondary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }

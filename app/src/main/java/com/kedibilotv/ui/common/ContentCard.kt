@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +26,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.kedibilotv.R
+import com.kedibilotv.ui.theme.NeonCoral
 import com.kedibilotv.ui.theme.NeonCyan
 import com.kedibilotv.ui.theme.NeonSurface
+import com.kedibilotv.ui.theme.NeonSurfaceRim
 import com.kedibilotv.ui.theme.NeonTextPrimary
 import com.kedibilotv.ui.theme.NeonTextSecondary
 
@@ -37,6 +40,8 @@ fun ContentCard(
     name: String,
     posterUrl: String?,
     modifier: Modifier = Modifier,
+    progress: Float? = null,
+    subtitle: String? = null,
     onClick: () -> Unit = {}
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -63,7 +68,6 @@ fun ContentCard(
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
     ) {
         Column {
-            // Poster
             Box {
                 AsyncImage(
                     model = posterUrl,
@@ -87,17 +91,39 @@ fun ContentCard(
                             )
                         )
                 )
+                // İzleme ilerleme çubuğu
+                if (progress != null) {
+                    LinearProgressIndicator(
+                        progress = { progress.coerceIn(0f, 1f) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(3.dp)
+                            .align(Alignment.BottomCenter),
+                        color = NeonCoral,
+                        trackColor = NeonSurfaceRim
+                    )
+                }
             }
 
-            // İsim
-            Text(
-                text = name,
-                style = MaterialTheme.typography.labelMedium,
-                color = NeonTextPrimary,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
-            )
+            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = NeonTextPrimary,
+                    maxLines = if (subtitle != null) 1 else 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = NeonTextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+            }
         }
     }
 }

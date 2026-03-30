@@ -13,6 +13,7 @@
     <string name="continue_watching">Devam Et</string>
     <string name="favorites">Favoriler</string>
     <string name="search_hint">Ara...</string>
+    <string name="search_categories">Kategori ara...</string>
     <string name="no_favorites">Henuz favori eklemedin</string>
     <string name="no_results">Sonuc bulunamadi</string>
     <string name="no_content">Icerik bulunamadi</string>
