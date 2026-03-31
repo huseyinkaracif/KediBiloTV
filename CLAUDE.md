@@ -1,4 +1,4 @@
-# KediBiloTV — Project Instructions
+# KediTV — Project Instructions
 
 ## Stack
 Android · Kotlin · Jetpack Compose + Compose TV · Media3 · Room · Ktor · Hilt · Coil

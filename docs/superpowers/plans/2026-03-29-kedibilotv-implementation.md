@@ -1,4 +1,4 @@
-# KediBiloTV Implementation Plan
+# KediTV Implementation Plan
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** Kotlin, minSdk 24, targetSdk 34, Jetpack Compose, Compose TV, Compose Navigation, Media3, Room, Ktor Client, Hilt, Coil, Coroutines + Flow
 
-**Spec:** `docs/superpowers/specs/2026-03-29-kedibilotv-design.md`
+**Spec:** `docs/superpowers/specs/2026-03-29-KediTV-design.md`
 
 ---
 
@@ -19,8 +19,8 @@ app/
 ├── build.gradle.kts
 ├── src/main/
 │   ├── AndroidManifest.xml
-│   ├── java/com/kedibilotv/
-│   │   ├── KediBiloApp.kt                          # Hilt Application class
+│   ├── java/com/KediTV/
+│   │   ├── KediApp.kt                          # Hilt Application class
 │   │   ├── MainActivity.kt                          # Single Activity, NavHost
 │   │   ├── data/
 │   │   │   ├── api/
@@ -33,7 +33,7 @@ app/
 │   │   │   │       ├── SeriesDto.kt
 │   │   │   │       └── SeriesInfoDto.kt
 │   │   │   ├── db/
-│   │   │   │   ├── KediBiloDatabase.kt              # Room database
+│   │   │   │   ├── KediDatabase.kt              # Room database
 │   │   │   │   ├── entity/
 │   │   │   │   │   ├── ServerConfigEntity.kt
 │   │   │   │   │   ├── FavoriteEntity.kt
@@ -74,7 +74,7 @@ app/
 │   │   ├── ui/
 │   │   │   ├── navigation/
 │   │   │   │   ├── NavRoutes.kt                     # Route constants
-│   │   │   │   └── KediBiloNavHost.kt               # NavHost setup
+│   │   │   │   └── KediNavHost.kt               # NavHost setup
 │   │   │   ├── common/
 │   │   │   │   ├── ContentCard.kt                   # Poster card (shared)
 │   │   │   │   ├── EmptyState.kt                    # Cat emoji empty states
@@ -84,7 +84,7 @@ app/
 │   │   │   ├── theme/
 │   │   │   │   ├── Color.kt
 │   │   │   │   ├── Type.kt
-│   │   │   │   └── Theme.kt                         # KediBiloTheme
+│   │   │   │   └── Theme.kt                         # KediTheme
 │   │   │   ├── login/
 │   │   │   │   ├── LoginScreen.kt                   # Platform-branching composable
 │   │   │   │   └── LoginViewModel.kt
@@ -109,7 +109,7 @@ app/
 │   │   │       ├── SettingsScreen.kt
 │   │   │       └── SettingsViewModel.kt
 │   │   ├── player/
-│   │   │   └── KediBiloPlayer.kt                    # Media3 wrapper
+│   │   │   └── KediPlayer.kt                    # Media3 wrapper
 │   │   ├── di/
 │   │   │   ├── AppModule.kt                         # Ktor, Room providers
 │   │   │   └── RepositoryModule.kt                  # Repository bindings
@@ -121,13 +121,13 @@ app/
 │       ├── font/nunito_bold.ttf
 │       ├── drawable/ic_launcher_foreground.xml       # Cat + TV vector
 │       └── drawable/ic_cat_placeholder.xml           # Poster placeholder
-├── src/test/java/com/kedibilotv/                    # Unit tests
+├── src/test/java/com/KediTV/                    # Unit tests
 │   ├── data/api/XtreamApiServiceTest.kt
 │   ├── data/repository/AuthRepositoryImplTest.kt
 │   ├── data/repository/ContentRepositoryImplTest.kt
 │   ├── domain/usecase/LoginUseCaseTest.kt
 │   └── domain/usecase/GetCategoriesUseCaseTest.kt
-└── src/androidTest/java/com/kedibilotv/             # Instrumented tests
+└── src/androidTest/java/com/KediTV/             # Instrumented tests
     └── data/db/DaoTest.kt
 ```
 
@@ -141,8 +141,8 @@ app/
 - Create: `app/build.gradle.kts`
 - Create: `gradle.properties`
 - Create: `app/src/main/AndroidManifest.xml`
-- Create: `app/src/main/java/com/kedibilotv/KediBiloApp.kt`
-- Create: `app/src/main/java/com/kedibilotv/MainActivity.kt`
+- Create: `app/src/main/java/com/KediTV/KediApp.kt`
+- Create: `app/src/main/java/com/KediTV/MainActivity.kt`
 - Create: `app/proguard-rules.pro`
 
 - [ ] **Step 1: Create root `settings.gradle.kts`**
@@ -162,7 +162,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "KediBiloTV"
+rootProject.name = "KediTV"
 include(":app")
 ```
 
@@ -199,11 +199,11 @@ plugins {
 }
 
 android {
-    namespace = "com.kedibilotv"
+    namespace = "com.KediTV"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.kedibilotv"
+        applicationId = "com.KediTV"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -319,19 +319,19 @@ dependencies {
         android:required="false" />
 
     <application
-        android:name=".KediBiloApp"
+        android:name=".KediApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.KediBiloTV">
+        android:theme="@style/Theme.KediTV">
 
         <!-- Mobile launcher -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
-            android:theme="@style/Theme.KediBiloTV">
+            android:theme="@style/Theme.KediTV">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -346,22 +346,22 @@ dependencies {
 </manifest>
 ```
 
-- [ ] **Step 6: Create `KediBiloApp.kt`**
+- [ ] **Step 6: Create `KediApp.kt`**
 
 ```kotlin
-package com.kedibilotv
+package com.KediTV
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class KediBiloApp : Application()
+class KediApp : Application()
 ```
 
 - [ ] **Step 7: Create stub `MainActivity.kt`**
 
 ```kotlin
-package com.kedibilotv
+package com.KediTV
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -391,9 +391,9 @@ class MainActivity : ComponentActivity() {
 -dontnote kotlinx.serialization.AnnotationsKt
 -keepclassmembers class kotlinx.serialization.json.** { *** Companion; }
 -keepclasseswithmembers class kotlinx.serialization.json.** { kotlinx.serialization.KSerializer serializer(...); }
--keep,includedescriptorclasses class com.kedibilotv.**$$serializer { *; }
--keepclassmembers class com.kedibilotv.** { *** Companion; }
--keepclasseswithmembers class com.kedibilotv.** { kotlinx.serialization.KSerializer serializer(...); }
+-keep,includedescriptorclasses class com.KediTV.**$$serializer { *; }
+-keepclassmembers class com.KediTV.** { *** Companion; }
+-keepclasseswithmembers class com.KediTV.** { kotlinx.serialization.KSerializer serializer(...); }
 ```
 
 - [ ] **Step 9: Create Gradle wrapper and verify build compiles**
@@ -414,24 +414,24 @@ git commit -m "feat: project scaffolding with all dependencies"
 ## Task 2: Domain Models & Repository Interfaces
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/domain/model/ContentType.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/ServerConfig.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/Category.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/ContentItem.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/SeriesInfo.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/Season.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/Episode.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/Favorite.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/model/WatchHistory.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/repository/AuthRepository.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/repository/ContentRepository.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/repository/FavoriteRepository.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/repository/WatchHistoryRepository.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/ContentType.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/ServerConfig.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/Category.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/ContentItem.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/SeriesInfo.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/Season.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/Episode.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/Favorite.kt`
+- Create: `app/src/main/java/com/KediTV/domain/model/WatchHistory.kt`
+- Create: `app/src/main/java/com/KediTV/domain/repository/AuthRepository.kt`
+- Create: `app/src/main/java/com/KediTV/domain/repository/ContentRepository.kt`
+- Create: `app/src/main/java/com/KediTV/domain/repository/FavoriteRepository.kt`
+- Create: `app/src/main/java/com/KediTV/domain/repository/WatchHistoryRepository.kt`
 
 - [ ] **Step 1: Create `ContentType.kt`**
 
 ```kotlin
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 enum class ContentType(val apiPath: String) {
     LIVE("live"),
@@ -443,7 +443,7 @@ enum class ContentType(val apiPath: String) {
 - [ ] **Step 2: Create `ServerConfig.kt`**
 
 ```kotlin
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class ServerConfig(
     val serverUrl: String,
@@ -456,7 +456,7 @@ data class ServerConfig(
 - [ ] **Step 3: Create `Category.kt`**
 
 ```kotlin
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class Category(
     val id: String,
@@ -468,7 +468,7 @@ data class Category(
 - [ ] **Step 4: Create `ContentItem.kt`**
 
 ```kotlin
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class ContentItem(
     val streamId: Int,
@@ -485,7 +485,7 @@ data class ContentItem(
 
 ```kotlin
 // SeriesInfo.kt
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class SeriesInfo(
     val seriesId: Int,
@@ -498,7 +498,7 @@ data class SeriesInfo(
 )
 
 // Season.kt
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class Season(
     val seasonNumber: Int,
@@ -507,7 +507,7 @@ data class Season(
 )
 
 // Episode.kt
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class Episode(
     val id: Int,
@@ -524,7 +524,7 @@ data class Episode(
 
 ```kotlin
 // Favorite.kt
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class Favorite(
     val streamId: Int,
@@ -536,7 +536,7 @@ data class Favorite(
 )
 
 // WatchHistory.kt
-package com.kedibilotv.domain.model
+package com.KediTV.domain.model
 
 data class WatchHistory(
     val streamId: Int,
@@ -555,9 +555,9 @@ data class WatchHistory(
 
 ```kotlin
 // AuthRepository.kt
-package com.kedibilotv.domain.repository
+package com.KediTV.domain.repository
 
-import com.kedibilotv.domain.model.ServerConfig
+import com.KediTV.domain.model.ServerConfig
 
 interface AuthRepository {
     suspend fun login(serverUrl: String, username: String, password: String): Result<ServerConfig>
@@ -566,12 +566,12 @@ interface AuthRepository {
 }
 
 // ContentRepository.kt
-package com.kedibilotv.domain.repository
+package com.KediTV.domain.repository
 
-import com.kedibilotv.domain.model.Category
-import com.kedibilotv.domain.model.ContentItem
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.model.SeriesInfo
+import com.KediTV.domain.model.Category
+import com.KediTV.domain.model.ContentItem
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.model.SeriesInfo
 
 interface ContentRepository {
     suspend fun getCategories(type: ContentType): Result<List<Category>>
@@ -584,10 +584,10 @@ interface ContentRepository {
 }
 
 // FavoriteRepository.kt
-package com.kedibilotv.domain.repository
+package com.KediTV.domain.repository
 
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.model.Favorite
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.model.Favorite
 import kotlinx.coroutines.flow.Flow
 
 interface FavoriteRepository {
@@ -598,9 +598,9 @@ interface FavoriteRepository {
 }
 
 // WatchHistoryRepository.kt
-package com.kedibilotv.domain.repository
+package com.KediTV.domain.repository
 
-import com.kedibilotv.domain.model.WatchHistory
+import com.KediTV.domain.model.WatchHistory
 import kotlinx.coroutines.flow.Flow
 
 interface WatchHistoryRepository {
@@ -618,7 +618,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 9: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/domain/
+git add app/src/main/java/com/KediTV/domain/
 git commit -m "feat: domain models and repository interfaces"
 ```
 
@@ -627,20 +627,20 @@ git commit -m "feat: domain models and repository interfaces"
 ## Task 3: Room Database & DAOs
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/data/db/entity/ServerConfigEntity.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/db/entity/FavoriteEntity.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/db/entity/WatchHistoryEntity.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/db/dao/ServerConfigDao.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/db/dao/FavoriteDao.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/db/dao/WatchHistoryDao.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/db/KediBiloDatabase.kt`
-- Test: `app/src/androidTest/java/com/kedibilotv/data/db/DaoTest.kt`
+- Create: `app/src/main/java/com/KediTV/data/db/entity/ServerConfigEntity.kt`
+- Create: `app/src/main/java/com/KediTV/data/db/entity/FavoriteEntity.kt`
+- Create: `app/src/main/java/com/KediTV/data/db/entity/WatchHistoryEntity.kt`
+- Create: `app/src/main/java/com/KediTV/data/db/dao/ServerConfigDao.kt`
+- Create: `app/src/main/java/com/KediTV/data/db/dao/FavoriteDao.kt`
+- Create: `app/src/main/java/com/KediTV/data/db/dao/WatchHistoryDao.kt`
+- Create: `app/src/main/java/com/KediTV/data/db/KediDatabase.kt`
+- Test: `app/src/androidTest/java/com/KediTV/data/db/DaoTest.kt`
 
 - [ ] **Step 1: Create Room entities**
 
 ```kotlin
 // ServerConfigEntity.kt
-package com.kedibilotv.data.db.entity
+package com.KediTV.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -656,7 +656,7 @@ data class ServerConfigEntity(
 )
 
 // FavoriteEntity.kt
-package com.kedibilotv.data.db.entity
+package com.KediTV.data.db.entity
 
 import androidx.room.Entity
 
@@ -671,7 +671,7 @@ data class FavoriteEntity(
 )
 
 // WatchHistoryEntity.kt
-package com.kedibilotv.data.db.entity
+package com.KediTV.data.db.entity
 
 import androidx.room.Entity
 
@@ -695,13 +695,13 @@ data class WatchHistoryEntity(
 
 ```kotlin
 // ServerConfigDao.kt
-package com.kedibilotv.data.db.dao
+package com.KediTV.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.kedibilotv.data.db.entity.ServerConfigEntity
+import com.KediTV.data.db.entity.ServerConfigEntity
 
 @Dao
 interface ServerConfigDao {
@@ -716,13 +716,13 @@ interface ServerConfigDao {
 }
 
 // FavoriteDao.kt
-package com.kedibilotv.data.db.dao
+package com.KediTV.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.kedibilotv.data.db.entity.FavoriteEntity
+import com.KediTV.data.db.entity.FavoriteEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -741,13 +741,13 @@ interface FavoriteDao {
 }
 
 // WatchHistoryDao.kt
-package com.kedibilotv.data.db.dao
+package com.KediTV.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.kedibilotv.data.db.entity.WatchHistoryEntity
+import com.KediTV.data.db.entity.WatchHistoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -763,26 +763,26 @@ interface WatchHistoryDao {
 }
 ```
 
-- [ ] **Step 3: Create `KediBiloDatabase.kt`**
+- [ ] **Step 3: Create `KediDatabase.kt`**
 
 ```kotlin
-package com.kedibilotv.data.db
+package com.KediTV.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.kedibilotv.data.db.dao.FavoriteDao
-import com.kedibilotv.data.db.dao.ServerConfigDao
-import com.kedibilotv.data.db.dao.WatchHistoryDao
-import com.kedibilotv.data.db.entity.FavoriteEntity
-import com.kedibilotv.data.db.entity.ServerConfigEntity
-import com.kedibilotv.data.db.entity.WatchHistoryEntity
+import com.KediTV.data.db.dao.FavoriteDao
+import com.KediTV.data.db.dao.ServerConfigDao
+import com.KediTV.data.db.dao.WatchHistoryDao
+import com.KediTV.data.db.entity.FavoriteEntity
+import com.KediTV.data.db.entity.ServerConfigEntity
+import com.KediTV.data.db.entity.WatchHistoryEntity
 
 @Database(
     entities = [ServerConfigEntity::class, FavoriteEntity::class, WatchHistoryEntity::class],
     version = 1,
     exportSchema = false
 )
-abstract class KediBiloDatabase : RoomDatabase() {
+abstract class KediDatabase : RoomDatabase() {
     abstract fun serverConfigDao(): ServerConfigDao
     abstract fun favoriteDao(): FavoriteDao
     abstract fun watchHistoryDao(): WatchHistoryDao
@@ -793,16 +793,16 @@ abstract class KediBiloDatabase : RoomDatabase() {
 
 ```kotlin
 // DaoTest.kt
-package com.kedibilotv.data.db
+package com.KediTV.data.db
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.kedibilotv.data.db.dao.FavoriteDao
-import com.kedibilotv.data.db.dao.WatchHistoryDao
-import com.kedibilotv.data.db.entity.FavoriteEntity
-import com.kedibilotv.data.db.entity.WatchHistoryEntity
+import com.KediTV.data.db.dao.FavoriteDao
+import com.KediTV.data.db.dao.WatchHistoryDao
+import com.KediTV.data.db.entity.FavoriteEntity
+import com.KediTV.data.db.entity.WatchHistoryEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -813,14 +813,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DaoTest {
-    private lateinit var db: KediBiloDatabase
+    private lateinit var db: KediDatabase
     private lateinit var favoriteDao: FavoriteDao
     private lateinit var watchHistoryDao: WatchHistoryDao
 
     @Before
     fun setup() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, KediBiloDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(context, KediDatabase::class.java).build()
         favoriteDao = db.favoriteDao()
         watchHistoryDao = db.watchHistoryDao()
     }
@@ -863,7 +863,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 6: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/data/db/ app/src/androidTest/
+git add app/src/main/java/com/KediTV/data/db/ app/src/androidTest/
 git commit -m "feat: Room database, entities, DAOs with tests"
 ```
 
@@ -872,20 +872,20 @@ git commit -m "feat: Room database, entities, DAOs with tests"
 ## Task 4: Xtream Codes API Service
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/data/api/model/AuthResponse.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/api/model/CategoryDto.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/api/model/LiveStreamDto.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/api/model/VodStreamDto.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/api/model/SeriesDto.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/api/model/SeriesInfoDto.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/api/XtreamApiService.kt`
-- Test: `app/src/test/java/com/kedibilotv/data/api/XtreamApiServiceTest.kt`
+- Create: `app/src/main/java/com/KediTV/data/api/model/AuthResponse.kt`
+- Create: `app/src/main/java/com/KediTV/data/api/model/CategoryDto.kt`
+- Create: `app/src/main/java/com/KediTV/data/api/model/LiveStreamDto.kt`
+- Create: `app/src/main/java/com/KediTV/data/api/model/VodStreamDto.kt`
+- Create: `app/src/main/java/com/KediTV/data/api/model/SeriesDto.kt`
+- Create: `app/src/main/java/com/KediTV/data/api/model/SeriesInfoDto.kt`
+- Create: `app/src/main/java/com/KediTV/data/api/XtreamApiService.kt`
+- Test: `app/src/test/java/com/KediTV/data/api/XtreamApiServiceTest.kt`
 
 - [ ] **Step 1: Create API DTOs**
 
 ```kotlin
 // AuthResponse.kt
-package com.kedibilotv.data.api.model
+package com.KediTV.data.api.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -914,7 +914,7 @@ data class ServerInfo(
 )
 
 // CategoryDto.kt
-package com.kedibilotv.data.api.model
+package com.KediTV.data.api.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -927,7 +927,7 @@ data class CategoryDto(
 )
 
 // LiveStreamDto.kt
-package com.kedibilotv.data.api.model
+package com.KediTV.data.api.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -942,7 +942,7 @@ data class LiveStreamDto(
 )
 
 // VodStreamDto.kt
-package com.kedibilotv.data.api.model
+package com.KediTV.data.api.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -958,7 +958,7 @@ data class VodStreamDto(
 )
 
 // SeriesDto.kt
-package com.kedibilotv.data.api.model
+package com.KediTV.data.api.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -974,7 +974,7 @@ data class SeriesDto(
 )
 
 // SeriesInfoDto.kt
-package com.kedibilotv.data.api.model
+package com.KediTV.data.api.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -1014,9 +1014,9 @@ data class EpisodeInfoDto(
 - [ ] **Step 2: Create `XtreamApiService.kt`**
 
 ```kotlin
-package com.kedibilotv.data.api
+package com.KediTV.data.api
 
-import com.kedibilotv.data.api.model.*
+import com.KediTV.data.api.model.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -1092,7 +1092,7 @@ class XtreamApiService @Inject constructor(
 - [ ] **Step 3: Write API service test with Ktor mock**
 
 ```kotlin
-package com.kedibilotv.data.api
+package com.KediTV.data.api
 
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
@@ -1159,13 +1159,13 @@ class XtreamApiServiceTest {
 
 - [ ] **Step 4: Run tests**
 
-Run: `./gradlew test --tests "com.kedibilotv.data.api.XtreamApiServiceTest"`
+Run: `./gradlew test --tests "com.KediTV.data.api.XtreamApiServiceTest"`
 Expected: 3 tests PASSED
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/data/api/ app/src/test/
+git add app/src/main/java/com/KediTV/data/api/ app/src/test/
 git commit -m "feat: Xtream Codes API service with DTOs and tests"
 ```
 
@@ -1174,25 +1174,25 @@ git commit -m "feat: Xtream Codes API service with DTOs and tests"
 ## Task 5: Repository Implementations & DI
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/data/repository/AuthRepositoryImpl.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/repository/ContentRepositoryImpl.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/repository/FavoriteRepositoryImpl.kt`
-- Create: `app/src/main/java/com/kedibilotv/data/repository/WatchHistoryRepositoryImpl.kt`
-- Create: `app/src/main/java/com/kedibilotv/di/AppModule.kt`
-- Create: `app/src/main/java/com/kedibilotv/di/RepositoryModule.kt`
-- Test: `app/src/test/java/com/kedibilotv/data/repository/AuthRepositoryImplTest.kt`
-- Test: `app/src/test/java/com/kedibilotv/data/repository/ContentRepositoryImplTest.kt`
+- Create: `app/src/main/java/com/KediTV/data/repository/AuthRepositoryImpl.kt`
+- Create: `app/src/main/java/com/KediTV/data/repository/ContentRepositoryImpl.kt`
+- Create: `app/src/main/java/com/KediTV/data/repository/FavoriteRepositoryImpl.kt`
+- Create: `app/src/main/java/com/KediTV/data/repository/WatchHistoryRepositoryImpl.kt`
+- Create: `app/src/main/java/com/KediTV/di/AppModule.kt`
+- Create: `app/src/main/java/com/KediTV/di/RepositoryModule.kt`
+- Test: `app/src/test/java/com/KediTV/data/repository/AuthRepositoryImplTest.kt`
+- Test: `app/src/test/java/com/KediTV/data/repository/ContentRepositoryImplTest.kt`
 
 - [ ] **Step 1: Create `AuthRepositoryImpl.kt`**
 
 ```kotlin
-package com.kedibilotv.data.repository
+package com.KediTV.data.repository
 
-import com.kedibilotv.data.api.XtreamApiService
-import com.kedibilotv.data.db.dao.ServerConfigDao
-import com.kedibilotv.data.db.entity.ServerConfigEntity
-import com.kedibilotv.domain.model.ServerConfig
-import com.kedibilotv.domain.repository.AuthRepository
+import com.KediTV.data.api.XtreamApiService
+import com.KediTV.data.db.dao.ServerConfigDao
+import com.KediTV.data.db.entity.ServerConfigEntity
+import com.KediTV.domain.model.ServerConfig
+import com.KediTV.domain.repository.AuthRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -1246,11 +1246,11 @@ class AuthRepositoryImpl @Inject constructor(
 - [ ] **Step 2: Create `ContentRepositoryImpl.kt`**
 
 ```kotlin
-package com.kedibilotv.data.repository
+package com.KediTV.data.repository
 
-import com.kedibilotv.data.api.XtreamApiService
-import com.kedibilotv.domain.model.*
-import com.kedibilotv.domain.repository.ContentRepository
+import com.KediTV.data.api.XtreamApiService
+import com.KediTV.domain.model.*
+import com.KediTV.domain.repository.ContentRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -1369,13 +1369,13 @@ class ContentRepositoryImpl @Inject constructor(
 
 ```kotlin
 // FavoriteRepositoryImpl.kt
-package com.kedibilotv.data.repository
+package com.KediTV.data.repository
 
-import com.kedibilotv.data.db.dao.FavoriteDao
-import com.kedibilotv.data.db.entity.FavoriteEntity
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.model.Favorite
-import com.kedibilotv.domain.repository.FavoriteRepository
+import com.KediTV.data.db.dao.FavoriteDao
+import com.KediTV.data.db.entity.FavoriteEntity
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.model.Favorite
+import com.KediTV.domain.repository.FavoriteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -1420,13 +1420,13 @@ class FavoriteRepositoryImpl @Inject constructor(
 }
 
 // WatchHistoryRepositoryImpl.kt
-package com.kedibilotv.data.repository
+package com.KediTV.data.repository
 
-import com.kedibilotv.data.db.dao.WatchHistoryDao
-import com.kedibilotv.data.db.entity.WatchHistoryEntity
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.model.WatchHistory
-import com.kedibilotv.domain.repository.WatchHistoryRepository
+import com.KediTV.data.db.dao.WatchHistoryDao
+import com.KediTV.data.db.entity.WatchHistoryEntity
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.model.WatchHistory
+import com.KediTV.domain.repository.WatchHistoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -1478,15 +1478,15 @@ class WatchHistoryRepositoryImpl @Inject constructor(
 
 ```kotlin
 // AppModule.kt
-package com.kedibilotv.di
+package com.KediTV.di
 
 import android.content.Context
 import androidx.room.Room
-import com.kedibilotv.data.api.XtreamApiService
-import com.kedibilotv.data.db.KediBiloDatabase
-import com.kedibilotv.data.db.dao.FavoriteDao
-import com.kedibilotv.data.db.dao.ServerConfigDao
-import com.kedibilotv.data.db.dao.WatchHistoryDao
+import com.KediTV.data.api.XtreamApiService
+import com.KediTV.data.db.KediDatabase
+import com.KediTV.data.db.dao.FavoriteDao
+import com.KediTV.data.db.dao.ServerConfigDao
+import com.KediTV.data.db.dao.WatchHistoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -1520,19 +1520,19 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): KediBiloDatabase =
-        Room.databaseBuilder(context, KediBiloDatabase::class.java, "kedibilotv.db").build()
+    fun provideDatabase(@ApplicationContext context: Context): KediDatabase =
+        Room.databaseBuilder(context, KediDatabase::class.java, "KediTV.db").build()
 
-    @Provides fun provideServerConfigDao(db: KediBiloDatabase): ServerConfigDao = db.serverConfigDao()
-    @Provides fun provideFavoriteDao(db: KediBiloDatabase): FavoriteDao = db.favoriteDao()
-    @Provides fun provideWatchHistoryDao(db: KediBiloDatabase): WatchHistoryDao = db.watchHistoryDao()
+    @Provides fun provideServerConfigDao(db: KediDatabase): ServerConfigDao = db.serverConfigDao()
+    @Provides fun provideFavoriteDao(db: KediDatabase): FavoriteDao = db.favoriteDao()
+    @Provides fun provideWatchHistoryDao(db: KediDatabase): WatchHistoryDao = db.watchHistoryDao()
 }
 
 // RepositoryModule.kt
-package com.kedibilotv.di
+package com.KediTV.di
 
-import com.kedibilotv.data.repository.*
-import com.kedibilotv.domain.repository.*
+import com.KediTV.data.repository.*
+import com.KediTV.domain.repository.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -1561,11 +1561,11 @@ abstract class RepositoryModule {
 
 ```kotlin
 // AuthRepositoryImplTest.kt
-package com.kedibilotv.data.repository
+package com.KediTV.data.repository
 
-import com.kedibilotv.data.api.XtreamApiService
-import com.kedibilotv.data.api.model.*
-import com.kedibilotv.data.db.dao.ServerConfigDao
+import com.KediTV.data.api.XtreamApiService
+import com.KediTV.data.api.model.*
+import com.KediTV.data.db.dao.ServerConfigDao
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -1602,11 +1602,11 @@ class AuthRepositoryImplTest {
 }
 
 // ContentRepositoryImplTest.kt
-package com.kedibilotv.data.repository
+package com.KediTV.data.repository
 
-import com.kedibilotv.data.api.XtreamApiService
-import com.kedibilotv.data.api.model.CategoryDto
-import com.kedibilotv.domain.model.ContentType
+import com.KediTV.data.api.XtreamApiService
+import com.KediTV.data.api.model.CategoryDto
+import com.KediTV.domain.model.ContentType
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -1649,7 +1649,7 @@ Expected: All tests PASSED
 - [ ] **Step 7: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/data/repository/ app/src/main/java/com/kedibilotv/di/ app/src/test/
+git add app/src/main/java/com/KediTV/data/repository/ app/src/main/java/com/KediTV/di/ app/src/test/
 git commit -m "feat: repository implementations and DI setup with tests"
 ```
 
@@ -1658,25 +1658,25 @@ git commit -m "feat: repository implementations and DI setup with tests"
 ## Task 6: Theme, Common UI & Navigation
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/ui/theme/Color.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/theme/Type.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/theme/Theme.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/common/PlatformUtils.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/common/ContentCard.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/common/EmptyState.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/common/ErrorState.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/common/LoadingIndicator.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/navigation/NavRoutes.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt`
+- Create: `app/src/main/java/com/KediTV/ui/theme/Color.kt`
+- Create: `app/src/main/java/com/KediTV/ui/theme/Type.kt`
+- Create: `app/src/main/java/com/KediTV/ui/theme/Theme.kt`
+- Create: `app/src/main/java/com/KediTV/ui/common/PlatformUtils.kt`
+- Create: `app/src/main/java/com/KediTV/ui/common/ContentCard.kt`
+- Create: `app/src/main/java/com/KediTV/ui/common/EmptyState.kt`
+- Create: `app/src/main/java/com/KediTV/ui/common/ErrorState.kt`
+- Create: `app/src/main/java/com/KediTV/ui/common/LoadingIndicator.kt`
+- Create: `app/src/main/java/com/KediTV/ui/navigation/NavRoutes.kt`
+- Create: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt`
 - Create: `app/src/main/res/values/strings.xml`
 - Create: `app/src/main/res/values/colors.xml`
-- Modify: `app/src/main/java/com/kedibilotv/MainActivity.kt`
+- Modify: `app/src/main/java/com/KediTV/MainActivity.kt`
 
 - [ ] **Step 1: Create theme files**
 
 ```kotlin
 // Color.kt
-package com.kedibilotv.ui.theme
+package com.KediTV.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -1690,7 +1690,7 @@ val KediTextSecondary = Color(0xFFB0B0B0)
 val KediError = Color(0xFFCF6679)
 
 // Type.kt
-package com.kedibilotv.ui.theme
+package com.KediTV.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -1698,7 +1698,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.kedibilotv.R
+import com.KediTV.R
 
 val NunitoFamily = FontFamily(
     Font(R.font.nunito_bold, FontWeight.Bold)
@@ -1715,7 +1715,7 @@ val KediTypography = Typography(
 )
 
 // Theme.kt
-package com.kedibilotv.ui.theme
+package com.KediTV.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -1735,7 +1735,7 @@ private val KediColorScheme = darkColorScheme(
 )
 
 @Composable
-fun KediBiloTheme(content: @Composable () -> Unit) {
+fun KediTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = KediColorScheme,
         typography = KediTypography,
@@ -1747,7 +1747,7 @@ fun KediBiloTheme(content: @Composable () -> Unit) {
 - [ ] **Step 2: Create `PlatformUtils.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.common
+package com.KediTV.ui.common
 
 import android.app.UiModeManager
 import android.content.Context
@@ -1770,7 +1770,7 @@ fun isTV(): Boolean {
 
 ```kotlin
 // ContentCard.kt
-package com.kedibilotv.ui.common
+package com.KediTV.ui.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -1788,7 +1788,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.kedibilotv.R
+import com.KediTV.R
 
 @Composable
 fun ContentCard(
@@ -1828,7 +1828,7 @@ fun ContentCard(
 }
 
 // EmptyState.kt
-package com.kedibilotv.ui.common
+package com.KediTV.ui.common
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -1857,7 +1857,7 @@ fun EmptyState(message: String, modifier: Modifier = Modifier) {
 }
 
 // ErrorState.kt
-package com.kedibilotv.ui.common
+package com.KediTV.ui.common
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -1887,7 +1887,7 @@ fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier = Modifi
 }
 
 // LoadingIndicator.kt
-package com.kedibilotv.ui.common
+package com.KediTV.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -1915,7 +1915,7 @@ fun LoadingIndicator(modifier: Modifier = Modifier) {
 
 ```kotlin
 // NavRoutes.kt
-package com.kedibilotv.ui.navigation
+package com.KediTV.ui.navigation
 
 object NavRoutes {
     const val LOGIN = "login"
@@ -1936,8 +1936,8 @@ object NavRoutes {
     }
 }
 
-// KediBiloNavHost.kt
-package com.kedibilotv.ui.navigation
+// KediNavHost.kt
+package com.KediTV.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -1947,7 +1947,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
 @Composable
-fun KediBiloNavHost(
+fun KediNavHost(
     navController: NavHostController,
     startDestination: String
 ) {
@@ -2004,16 +2004,16 @@ fun KediBiloNavHost(
 **Important:** Keep `@AndroidEntryPoint` — required for Hilt injection.
 
 ```kotlin
-package com.kedibilotv
+package com.KediTV
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
-import com.kedibilotv.data.api.XtreamApiService
-import com.kedibilotv.ui.navigation.KediBiloNavHost
-import com.kedibilotv.ui.navigation.NavRoutes
-import com.kedibilotv.ui.theme.KediBiloTheme
+import com.KediTV.data.api.XtreamApiService
+import com.KediTV.ui.navigation.KediNavHost
+import com.KediTV.ui.navigation.NavRoutes
+import com.KediTV.ui.theme.KediTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -2025,7 +2025,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            KediBiloTheme {
+            KediTheme {
                 val navController = rememberNavController()
 
                 // Wire 403 callback — navigate to login on session expiry
@@ -2037,7 +2037,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                KediBiloNavHost(
+                KediNavHost(
                     navController = navController,
                     startDestination = NavRoutes.LOGIN
                 )
@@ -2053,8 +2053,8 @@ class MainActivity : ComponentActivity() {
 <!-- strings.xml -->
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KediBiloTV</string>
-    <string name="login_title">KediBiloTV\'ye Hos Geldin</string>
+    <string name="app_name">KediTV</string>
+    <string name="login_title">KediTV\'ye Hos Geldin</string>
     <string name="server_url">Sunucu URL</string>
     <string name="username">Kullanici Adi</string>
     <string name="password">Sifre</string>
@@ -2157,7 +2157,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 10: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/ui/ app/src/main/res/ app/src/main/java/com/kedibilotv/MainActivity.kt
+git add app/src/main/java/com/KediTV/ui/ app/src/main/res/ app/src/main/java/com/KediTV/MainActivity.kt
 git commit -m "feat: theme, common UI components, and navigation setup"
 ```
 
@@ -2166,19 +2166,19 @@ git commit -m "feat: theme, common UI components, and navigation setup"
 ## Task 7: Login Screen
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/domain/usecase/LoginUseCase.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/login/LoginViewModel.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/login/LoginScreen.kt`
-- Modify: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt`
-- Test: `app/src/test/java/com/kedibilotv/domain/usecase/LoginUseCaseTest.kt`
+- Create: `app/src/main/java/com/KediTV/domain/usecase/LoginUseCase.kt`
+- Create: `app/src/main/java/com/KediTV/ui/login/LoginViewModel.kt`
+- Create: `app/src/main/java/com/KediTV/ui/login/LoginScreen.kt`
+- Modify: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt`
+- Test: `app/src/test/java/com/KediTV/domain/usecase/LoginUseCaseTest.kt`
 
 - [ ] **Step 1: Write LoginUseCase test**
 
 ```kotlin
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.ServerConfig
-import com.kedibilotv.domain.repository.AuthRepository
+import com.KediTV.domain.model.ServerConfig
+import com.KediTV.domain.repository.AuthRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -2211,16 +2211,16 @@ class LoginUseCaseTest {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew test --tests "com.kedibilotv.domain.usecase.LoginUseCaseTest"`
+Run: `./gradlew test --tests "com.KediTV.domain.usecase.LoginUseCaseTest"`
 Expected: FAIL — LoginUseCase not found
 
 - [ ] **Step 3: Create `LoginUseCase.kt`**
 
 ```kotlin
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.ServerConfig
-import com.kedibilotv.domain.repository.AuthRepository
+import com.KediTV.domain.model.ServerConfig
+import com.KediTV.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
@@ -2236,18 +2236,18 @@ class LoginUseCase @Inject constructor(
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew test --tests "com.kedibilotv.domain.usecase.LoginUseCaseTest"`
+Run: `./gradlew test --tests "com.KediTV.domain.usecase.LoginUseCaseTest"`
 Expected: PASSED
 
 - [ ] **Step 5: Create `LoginViewModel.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.login
+package com.KediTV.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kedibilotv.domain.repository.AuthRepository
-import com.kedibilotv.domain.usecase.LoginUseCase
+import com.KediTV.domain.repository.AuthRepository
+import com.KediTV.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -2320,7 +2320,7 @@ class LoginViewModel @Inject constructor(
 - [ ] **Step 6: Create `LoginScreen.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.login
+package com.KediTV.ui.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -2334,8 +2334,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.kedibilotv.R
-import com.kedibilotv.ui.common.LoadingIndicator
+import com.KediTV.R
+import com.KediTV.ui.common.LoadingIndicator
 
 @Composable
 fun LoginScreen(
@@ -2421,7 +2421,7 @@ fun LoginScreen(
 
 - [ ] **Step 7: Wire LoginScreen into NavHost**
 
-Update the `composable(NavRoutes.LOGIN)` block in `KediBiloNavHost.kt`:
+Update the `composable(NavRoutes.LOGIN)` block in `KediNavHost.kt`:
 
 ```kotlin
 composable(NavRoutes.LOGIN) {
@@ -2441,7 +2441,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 9: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/domain/usecase/LoginUseCase.kt app/src/main/java/com/kedibilotv/ui/login/ app/src/main/java/com/kedibilotv/ui/navigation/ app/src/test/
+git add app/src/main/java/com/KediTV/domain/usecase/LoginUseCase.kt app/src/main/java/com/KediTV/ui/login/ app/src/main/java/com/KediTV/ui/navigation/ app/src/test/
 git commit -m "feat: login screen with auto-login and Xtream auth"
 ```
 
@@ -2450,20 +2450,20 @@ git commit -m "feat: login screen with auto-login and Xtream auth"
 ## Task 8: Home Screen
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/domain/usecase/GetContinueWatchingUseCase.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/home/HomeViewModel.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/home/HomeScreen.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/home/HomeMobileContent.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/home/HomeTvContent.kt`
-- Modify: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt`
+- Create: `app/src/main/java/com/KediTV/domain/usecase/GetContinueWatchingUseCase.kt`
+- Create: `app/src/main/java/com/KediTV/ui/home/HomeViewModel.kt`
+- Create: `app/src/main/java/com/KediTV/ui/home/HomeScreen.kt`
+- Create: `app/src/main/java/com/KediTV/ui/home/HomeMobileContent.kt`
+- Create: `app/src/main/java/com/KediTV/ui/home/HomeTvContent.kt`
+- Modify: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt`
 
 - [ ] **Step 1: Create `GetContinueWatchingUseCase.kt`**
 
 ```kotlin
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.WatchHistory
-import com.kedibilotv.domain.repository.WatchHistoryRepository
+import com.KediTV.domain.model.WatchHistory
+import com.KediTV.domain.repository.WatchHistoryRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -2477,14 +2477,14 @@ class GetContinueWatchingUseCase @Inject constructor(
 - [ ] **Step 2: Create `HomeViewModel.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.home
+package com.KediTV.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kedibilotv.domain.model.*
-import com.kedibilotv.domain.repository.ContentRepository
-import com.kedibilotv.domain.repository.FavoriteRepository
-import com.kedibilotv.domain.usecase.GetContinueWatchingUseCase
+import com.KediTV.domain.model.*
+import com.KediTV.domain.repository.ContentRepository
+import com.KediTV.domain.repository.FavoriteRepository
+import com.KediTV.domain.usecase.GetContinueWatchingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -2564,13 +2564,13 @@ class HomeViewModel @Inject constructor(
 - [ ] **Step 3: Create `HomeScreen.kt` with platform branching**
 
 ```kotlin
-package com.kedibilotv.ui.home
+package com.KediTV.ui.home
 
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.kedibilotv.ui.common.ErrorState
-import com.kedibilotv.ui.common.LoadingIndicator
-import com.kedibilotv.ui.common.isTV
+import com.KediTV.ui.common.ErrorState
+import com.KediTV.ui.common.LoadingIndicator
+import com.KediTV.ui.common.isTV
 
 @Composable
 fun HomeScreen(
@@ -2611,7 +2611,7 @@ fun HomeScreen(
 - [ ] **Step 4: Create `HomeMobileContent.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.home
+package com.KediTV.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -2630,9 +2630,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.kedibilotv.R
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.ui.common.ContentCard
+import com.KediTV.R
+import com.KediTV.domain.model.ContentType
+import com.KediTV.ui.common.ContentCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -2646,7 +2646,7 @@ fun HomeMobileContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("KediBiloTV", style = MaterialTheme.typography.headlineMedium) },
+                title = { Text("KediTV", style = MaterialTheme.typography.headlineMedium) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 actions = {
                     IconButton(onClick = onSettingsClick) {
@@ -2761,7 +2761,7 @@ private fun CategoryButton(text: String, modifier: Modifier = Modifier, onClick:
 - [ ] **Step 5: Create `HomeTvContent.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.home
+package com.KediTV.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -2773,9 +2773,9 @@ import androidx.compose.material3.Text
 import androidx.tv.foundation.lazy.list.TvLazyColumn
 import androidx.tv.foundation.lazy.list.TvLazyRow
 import androidx.tv.foundation.lazy.list.items
-import com.kedibilotv.R
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.ui.common.ContentCard
+import com.KediTV.R
+import com.KediTV.domain.model.ContentType
+import com.KediTV.ui.common.ContentCard
 
 // NOTE: Use androidx.compose.material3.Text throughout — NOT androidx.tv.material3.Text.
 // The two have incompatible TextStyle types. Keep all Text/MaterialTheme imports from compose.material3.
@@ -2848,7 +2848,7 @@ fun HomeTvContent(
 
 - [ ] **Step 6: Wire HomeScreen into NavHost**
 
-Update the `composable(NavRoutes.HOME)` block in `KediBiloNavHost.kt`:
+Update the `composable(NavRoutes.HOME)` block in `KediNavHost.kt`:
 
 ```kotlin
 composable(NavRoutes.HOME) {
@@ -2869,7 +2869,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 8: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/ui/home/ app/src/main/java/com/kedibilotv/domain/usecase/GetContinueWatchingUseCase.kt app/src/main/java/com/kedibilotv/ui/navigation/
+git add app/src/main/java/com/KediTV/ui/home/ app/src/main/java/com/KediTV/domain/usecase/GetContinueWatchingUseCase.kt app/src/main/java/com/KediTV/ui/navigation/
 git commit -m "feat: home screen with continue watching, favorites, and categories"
 ```
 
@@ -2878,23 +2878,23 @@ git commit -m "feat: home screen with continue watching, favorites, and categori
 ## Task 9: Category & Content List Screens
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/domain/usecase/GetCategoriesUseCase.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/usecase/GetContentListUseCase.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/category/CategoryViewModel.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/category/CategoryScreen.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/content/ContentListViewModel.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/content/ContentListScreen.kt`
-- Modify: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt`
-- Test: `app/src/test/java/com/kedibilotv/domain/usecase/GetCategoriesUseCaseTest.kt`
+- Create: `app/src/main/java/com/KediTV/domain/usecase/GetCategoriesUseCase.kt`
+- Create: `app/src/main/java/com/KediTV/domain/usecase/GetContentListUseCase.kt`
+- Create: `app/src/main/java/com/KediTV/ui/category/CategoryViewModel.kt`
+- Create: `app/src/main/java/com/KediTV/ui/category/CategoryScreen.kt`
+- Create: `app/src/main/java/com/KediTV/ui/content/ContentListViewModel.kt`
+- Create: `app/src/main/java/com/KediTV/ui/content/ContentListScreen.kt`
+- Modify: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt`
+- Test: `app/src/test/java/com/KediTV/domain/usecase/GetCategoriesUseCaseTest.kt`
 
 - [ ] **Step 1: Write GetCategoriesUseCase test**
 
 ```kotlin
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.Category
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.repository.ContentRepository
+import com.KediTV.domain.model.Category
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.repository.ContentRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -2922,11 +2922,11 @@ class GetCategoriesUseCaseTest {
 
 ```kotlin
 // GetCategoriesUseCase.kt
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.Category
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.repository.ContentRepository
+import com.KediTV.domain.model.Category
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.repository.ContentRepository
 import javax.inject.Inject
 
 class GetCategoriesUseCase @Inject constructor(
@@ -2937,11 +2937,11 @@ class GetCategoriesUseCase @Inject constructor(
 }
 
 // GetContentListUseCase.kt
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.ContentItem
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.repository.ContentRepository
+import com.KediTV.domain.model.ContentItem
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.repository.ContentRepository
 import javax.inject.Inject
 
 class GetContentListUseCase @Inject constructor(
@@ -2954,21 +2954,21 @@ class GetContentListUseCase @Inject constructor(
 
 - [ ] **Step 3: Run test**
 
-Run: `./gradlew test --tests "com.kedibilotv.domain.usecase.GetCategoriesUseCaseTest"`
+Run: `./gradlew test --tests "com.KediTV.domain.usecase.GetCategoriesUseCaseTest"`
 Expected: PASSED
 
 - [ ] **Step 4: Create `CategoryViewModel.kt` and `CategoryScreen.kt`**
 
 ```kotlin
 // CategoryViewModel.kt
-package com.kedibilotv.ui.category
+package com.KediTV.ui.category
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kedibilotv.domain.model.Category
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.usecase.GetCategoriesUseCase
+import com.KediTV.domain.model.Category
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.usecase.GetCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3008,7 +3008,7 @@ class CategoryViewModel @Inject constructor(
 }
 
 // CategoryScreen.kt
-package com.kedibilotv.ui.category
+package com.KediTV.ui.category
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -3024,10 +3024,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.ui.common.EmptyState
-import com.kedibilotv.ui.common.ErrorState
-import com.kedibilotv.ui.common.LoadingIndicator
+import com.KediTV.domain.model.ContentType
+import com.KediTV.ui.common.EmptyState
+import com.KediTV.ui.common.ErrorState
+import com.KediTV.ui.common.LoadingIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3087,14 +3087,14 @@ fun CategoryScreen(
 
 ```kotlin
 // ContentListViewModel.kt
-package com.kedibilotv.ui.content
+package com.KediTV.ui.content
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kedibilotv.domain.model.ContentItem
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.usecase.GetContentListUseCase
+import com.KediTV.domain.model.ContentItem
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.usecase.GetContentListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3145,7 +3145,7 @@ class ContentListViewModel @Inject constructor(
 }
 
 // ContentListScreen.kt
-package com.kedibilotv.ui.content
+package com.KediTV.ui.content
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -3159,8 +3159,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.kedibilotv.R
-import com.kedibilotv.ui.common.*
+import com.KediTV.R
+import com.KediTV.ui.common.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3216,7 +3216,7 @@ fun ContentListScreen(
 
 - [ ] **Step 6: Wire screens into NavHost**
 
-Update Category and Content routes in `KediBiloNavHost.kt`:
+Update Category and Content routes in `KediNavHost.kt`:
 
 ```kotlin
 composable(NavRoutes.CATEGORY, arguments = listOf(navArgument("type") { type = NavType.StringType })) {
@@ -3249,7 +3249,7 @@ Expected: All PASSED, BUILD SUCCESSFUL
 - [ ] **Step 8: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/ui/category/ app/src/main/java/com/kedibilotv/ui/content/ app/src/main/java/com/kedibilotv/domain/usecase/ app/src/main/java/com/kedibilotv/ui/navigation/ app/src/test/
+git add app/src/main/java/com/KediTV/ui/category/ app/src/main/java/com/KediTV/ui/content/ app/src/main/java/com/KediTV/domain/usecase/ app/src/main/java/com/KediTV/ui/navigation/ app/src/test/
 git commit -m "feat: category and content list screens with search filtering"
 ```
 
@@ -3258,20 +3258,20 @@ git commit -m "feat: category and content list screens with search filtering"
 ## Task 10: Detail Screen
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/domain/usecase/GetSeriesInfoUseCase.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/usecase/ToggleFavoriteUseCase.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/detail/DetailViewModel.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/detail/DetailScreen.kt`
-- Modify: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt`
+- Create: `app/src/main/java/com/KediTV/domain/usecase/GetSeriesInfoUseCase.kt`
+- Create: `app/src/main/java/com/KediTV/domain/usecase/ToggleFavoriteUseCase.kt`
+- Create: `app/src/main/java/com/KediTV/ui/detail/DetailViewModel.kt`
+- Create: `app/src/main/java/com/KediTV/ui/detail/DetailScreen.kt`
+- Modify: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt`
 
 - [ ] **Step 1: Create use cases**
 
 ```kotlin
 // GetSeriesInfoUseCase.kt
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.SeriesInfo
-import com.kedibilotv.domain.repository.ContentRepository
+import com.KediTV.domain.model.SeriesInfo
+import com.KediTV.domain.repository.ContentRepository
 import javax.inject.Inject
 
 class GetSeriesInfoUseCase @Inject constructor(
@@ -3282,11 +3282,11 @@ class GetSeriesInfoUseCase @Inject constructor(
 }
 
 // ToggleFavoriteUseCase.kt
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.model.Favorite
-import com.kedibilotv.domain.repository.FavoriteRepository
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.model.Favorite
+import com.KediTV.domain.repository.FavoriteRepository
 import javax.inject.Inject
 
 class ToggleFavoriteUseCase @Inject constructor(
@@ -3313,17 +3313,17 @@ class ToggleFavoriteUseCase @Inject constructor(
 - [ ] **Step 2: Create `DetailViewModel.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.detail
+package com.KediTV.ui.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kedibilotv.domain.model.*
-import com.kedibilotv.domain.repository.ContentRepository
-import com.kedibilotv.domain.repository.FavoriteRepository
-import com.kedibilotv.domain.repository.WatchHistoryRepository
-import com.kedibilotv.domain.usecase.GetSeriesInfoUseCase
-import com.kedibilotv.domain.usecase.ToggleFavoriteUseCase
+import com.KediTV.domain.model.*
+import com.KediTV.domain.repository.ContentRepository
+import com.KediTV.domain.repository.FavoriteRepository
+import com.KediTV.domain.repository.WatchHistoryRepository
+import com.KediTV.domain.usecase.GetSeriesInfoUseCase
+import com.KediTV.domain.usecase.ToggleFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3418,7 +3418,7 @@ class DetailViewModel @Inject constructor(
 - [ ] **Step 3: Create `DetailScreen.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.detail
+package com.KediTV.ui.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -3440,9 +3440,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.kedibilotv.R
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.ui.common.*
+import com.KediTV.R
+import com.KediTV.domain.model.ContentType
+import com.KediTV.ui.common.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3588,7 +3588,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 6: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/ui/detail/ app/src/main/java/com/kedibilotv/domain/usecase/ app/src/main/java/com/kedibilotv/ui/navigation/
+git add app/src/main/java/com/KediTV/ui/detail/ app/src/main/java/com/KediTV/domain/usecase/ app/src/main/java/com/KediTV/ui/navigation/
 git commit -m "feat: detail screen with series episodes and favorites"
 ```
 
@@ -3597,16 +3597,16 @@ git commit -m "feat: detail screen with series episodes and favorites"
 ## Task 11: Player Screen
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/player/KediBiloPlayer.kt`
-- Create: `app/src/main/java/com/kedibilotv/domain/usecase/SaveWatchProgressUseCase.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/player/PlayerViewModel.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/player/PlayerScreen.kt`
-- Modify: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt`
+- Create: `app/src/main/java/com/KediTV/player/KediPlayer.kt`
+- Create: `app/src/main/java/com/KediTV/domain/usecase/SaveWatchProgressUseCase.kt`
+- Create: `app/src/main/java/com/KediTV/ui/player/PlayerViewModel.kt`
+- Create: `app/src/main/java/com/KediTV/ui/player/PlayerScreen.kt`
+- Modify: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt`
 
-- [ ] **Step 1: Create `KediBiloPlayer.kt` (Media3 wrapper)**
+- [ ] **Step 1: Create `KediPlayer.kt` (Media3 wrapper)**
 
 ```kotlin
-package com.kedibilotv.player
+package com.KediTV.player
 
 import android.content.Context
 import androidx.media3.common.MediaItem
@@ -3614,7 +3614,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.DefaultLoadControl
 
-object KediBiloPlayer {
+object KediPlayer {
 
     fun create(context: Context): ExoPlayer {
         val loadControl = DefaultLoadControl.Builder()
@@ -3645,11 +3645,11 @@ object KediBiloPlayer {
 - [ ] **Step 2: Create `SaveWatchProgressUseCase.kt`**
 
 ```kotlin
-package com.kedibilotv.domain.usecase
+package com.KediTV.domain.usecase
 
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.model.WatchHistory
-import com.kedibilotv.domain.repository.WatchHistoryRepository
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.model.WatchHistory
+import com.KediTV.domain.repository.WatchHistoryRepository
 import javax.inject.Inject
 
 class SaveWatchProgressUseCase @Inject constructor(
@@ -3685,15 +3685,15 @@ class SaveWatchProgressUseCase @Inject constructor(
 - [ ] **Step 3: Create `PlayerViewModel.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.player
+package com.KediTV.ui.player
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kedibilotv.domain.model.ContentType
-import com.kedibilotv.domain.repository.ContentRepository
-import com.kedibilotv.domain.repository.WatchHistoryRepository
-import com.kedibilotv.domain.usecase.SaveWatchProgressUseCase
+import com.KediTV.domain.model.ContentType
+import com.KediTV.domain.repository.ContentRepository
+import com.KediTV.domain.repository.WatchHistoryRepository
+import com.KediTV.domain.usecase.SaveWatchProgressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3761,7 +3761,7 @@ class PlayerViewModel @Inject constructor(
 - [ ] **Step 4: Create `PlayerScreen.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.player
+package com.KediTV.ui.player
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
@@ -3777,7 +3777,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
-import com.kedibilotv.player.KediBiloPlayer
+import com.KediTV.player.KediPlayer
 
 @Composable
 fun PlayerScreen(
@@ -3789,7 +3789,7 @@ fun PlayerScreen(
     val activity = context as? Activity
 
     val player = remember {
-        KediBiloPlayer.create(context)
+        KediPlayer.create(context)
     }
 
     // Lock to landscape for mobile
@@ -3809,7 +3809,7 @@ fun PlayerScreen(
     // Start playback when URL is ready
     LaunchedEffect(state.streamUrl) {
         if (state.streamUrl.isNotEmpty()) {
-            KediBiloPlayer.play(player, state.streamUrl, state.startPositionMs)
+            KediPlayer.play(player, state.streamUrl, state.startPositionMs)
         }
     }
 
@@ -3853,7 +3853,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 7: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/player/ app/src/main/java/com/kedibilotv/ui/player/ app/src/main/java/com/kedibilotv/domain/usecase/SaveWatchProgressUseCase.kt app/src/main/java/com/kedibilotv/ui/navigation/
+git add app/src/main/java/com/KediTV/player/ app/src/main/java/com/KediTV/ui/player/ app/src/main/java/com/KediTV/domain/usecase/SaveWatchProgressUseCase.kt app/src/main/java/com/KediTV/ui/navigation/
 git commit -m "feat: player screen with Media3, resume playback, and progress saving"
 ```
 
@@ -3862,18 +3862,18 @@ git commit -m "feat: player screen with Media3, resume playback, and progress sa
 ## Task 12: Settings Screen
 
 **Files:**
-- Create: `app/src/main/java/com/kedibilotv/ui/settings/SettingsViewModel.kt`
-- Create: `app/src/main/java/com/kedibilotv/ui/settings/SettingsScreen.kt`
-- Modify: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt`
+- Create: `app/src/main/java/com/KediTV/ui/settings/SettingsViewModel.kt`
+- Create: `app/src/main/java/com/KediTV/ui/settings/SettingsScreen.kt`
+- Modify: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt`
 
 - [ ] **Step 1: Create `SettingsViewModel.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.settings
+package com.KediTV.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kedibilotv.domain.repository.AuthRepository
+import com.KediTV.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3901,7 +3901,7 @@ class SettingsViewModel @Inject constructor(
 
     fun setBufferSize(size: BufferSize) {
         _state.value = _state.value.copy(bufferSize = size)
-        // KediBiloPlayer reads this via PlayerViewModel before creating ExoPlayer
+        // KediPlayer reads this via PlayerViewModel before creating ExoPlayer
     }
 
     fun logout() {
@@ -3916,7 +3916,7 @@ class SettingsViewModel @Inject constructor(
 - [ ] **Step 2: Create `SettingsScreen.kt`**
 
 ```kotlin
-package com.kedibilotv.ui.settings
+package com.KediTV.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -3927,7 +3927,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.kedibilotv.R
+import com.KediTV.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3955,7 +3955,7 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("KediBiloTV v1.0.0", style = MaterialTheme.typography.titleLarge)
+            Text("KediTV v1.0.0", style = MaterialTheme.typography.titleLarge)
 
             HorizontalDivider()
 
@@ -4008,7 +4008,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/src/main/java/com/kedibilotv/ui/settings/ app/src/main/java/com/kedibilotv/ui/navigation/
+git add app/src/main/java/com/KediTV/ui/settings/ app/src/main/java/com/KediTV/ui/navigation/
 git commit -m "feat: settings screen with logout"
 ```
 
@@ -4017,14 +4017,14 @@ git commit -m "feat: settings screen with logout"
 ## Task 13: Final Integration & Polish
 
 **Files:**
-- Modify: `app/src/main/java/com/kedibilotv/ui/navigation/KediBiloNavHost.kt` (ensure all routes complete)
-- Create: `app/src/main/java/com/kedibilotv/util/Extensions.kt`
+- Modify: `app/src/main/java/com/KediTV/ui/navigation/KediNavHost.kt` (ensure all routes complete)
+- Create: `app/src/main/java/com/KediTV/util/Extensions.kt`
 - Modify: `app/src/main/res/values/strings.xml` (if needed)
 
 - [ ] **Step 1: Create `Extensions.kt`**
 
 ```kotlin
-package com.kedibilotv.util
+package com.KediTV.util
 
 fun Long.formatDuration(): String {
     val totalSeconds = this / 1000
@@ -4041,7 +4041,7 @@ fun Long.formatDuration(): String {
 
 - [ ] **Step 2: Verify all NavHost routes are wired**
 
-Read `KediBiloNavHost.kt` and confirm all composable routes call their screens.
+Read `KediNavHost.kt` and confirm all composable routes call their screens.
 
 - [ ] **Step 3: Run full test suite**
 

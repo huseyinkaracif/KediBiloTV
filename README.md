@@ -1,4 +1,4 @@
-# KediBiloTV
+# KediTV
 
 A Netflix-style, cat-themed Android IPTV application supporting Android TV, phones, and tablets.
 
@@ -40,7 +40,7 @@ A Netflix-style, cat-themed Android IPTV application supporting Android TV, phon
 ## Project Structure
 
 ```
-app/src/main/java/com/kedibilotv/
+app/src/main/java/com/KediTV/
 ├── data/
 │   ├── api/          # Xtream Codes API service and DTOs
 │   ├── db/           # Room database, entities, DAOs
@@ -51,7 +51,7 @@ app/src/main/java/com/kedibilotv/
 │   └── usecase/      # Business logic use cases
 ├── ui/
 │   ├── common/       # Shared UI components
-│   ├── theme/        # KediBilo theme, colors, typography
+│   ├── theme/        # Kedi theme, colors, typography
 │   ├── navigation/   # NavHost and route definitions
 │   ├── login/        # Login screen
 │   ├── home/         # Home screen (TV + Mobile)
@@ -92,8 +92,8 @@ app/src/main/java/com/kedibilotv/
 ## Getting Started
 
 ```bash
-git clone https://github.com/huseyinkaracif/KediBiloTV.git
-cd KediBiloTV
+git clone https://github.com/huseyinkaracif/KediTV.git
+cd KediTV
 ./gradlew assembleDebug
 ```
 

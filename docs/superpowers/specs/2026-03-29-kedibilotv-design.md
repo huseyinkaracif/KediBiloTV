@@ -1,8 +1,8 @@
-# KediBiloTV - Tasarim Dokumani
+# KediTV - Tasarim Dokumani
 
 ## Ozet
 
-KediBiloTV, Android TV, telefon ve tablet icin gelistirilen bir IPTV uygulamasidir. Xtream Codes API uzerinden canli TV, film ve dizi iceriklerini kullaniciya sunar. Netflix benzeri ama kedi temali, neseli bir arayuze sahiptir. Dusuk RAM/CPU cihazlarda optimize calisma onceliktir.
+KediTV, Android TV, telefon ve tablet icin gelistirilen bir IPTV uygulamasidir. Xtream Codes API uzerinden canli TV, film ve dizi iceriklerini kullaniciya sunar. Netflix benzeri ama kedi temali, neseli bir arayuze sahiptir. Dusuk RAM/CPU cihazlarda optimize calisma onceliktir.
 
 ## Kararlar
 
@@ -33,7 +33,7 @@ KediBiloTV, Android TV, telefon ve tablet icin gelistirilen bir IPTV uygulamasid
 ## Paket Yapisi
 
 ```
-com.kedibilotv
+com.KediTV
 ├── data/
 │   ├── api/          # Xtream Codes API servisi
 │   ├── db/           # Room entities, DAO'lar
@@ -47,7 +47,7 @@ com.kedibilotv
 │   ├── mobile/       # Telefon/tablet composable'lari
 │   ├── tv/           # TV composable'lari (Compose TV)
 │   ├── common/       # Paylasilan UI bilesenleri
-│   └── theme/        # KediBilo temasi, renkler, tipografi
+│   └── theme/        # Kedi temasi, renkler, tipografi
 ├── player/           # Media3 player wrapper
 ├── di/               # Hilt modulleri
 └── util/             # Extension fonksiyonlari

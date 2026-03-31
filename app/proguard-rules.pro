@@ -7,6 +7,6 @@
 -dontnote kotlinx.serialization.AnnotationsKt
 -keepclassmembers class kotlinx.serialization.json.** { *** Companion; }
 -keepclasseswithmembers class kotlinx.serialization.json.** { kotlinx.serialization.KSerializer serializer(...); }
--keep,includedescriptorclasses class com.kedibilotv.**$$serializer { *; }
--keepclassmembers class com.kedibilotv.** { *** Companion; }
--keepclasseswithmembers class com.kedibilotv.** { kotlinx.serialization.KSerializer serializer(...); }
+-keep,includedescriptorclasses class com.keditv.**$$serializer { *; }
+-keepclassmembers class com.keditv.** { *** Companion; }
+-keepclasseswithmembers class com.keditv.** { kotlinx.serialization.KSerializer serializer(...); }
