@@ -6,7 +6,4 @@
     <color name="neon_coral">#FFFF4500</color>
     <color name="neon_cyan">#FF00FFD1</color>
     <color name="neon_fuchsia">#FFFF0080</color>
-    
-    <!-- Launcher Icon Background -->
-    <color name="ic_launcher_background">#FF040E0E</color>
 </resources>
