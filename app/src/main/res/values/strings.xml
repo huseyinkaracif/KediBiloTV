@@ -39,4 +39,8 @@
     <string name="buffer_high">Yuksek</string>
     <string name="buffer_size">Buffer Boyutu</string>
     <string name="season_label">Sezon %d</string>
+    <string name="remove_from_history">Listeden Kaldır</string>
+    <string name="remove_from_history_confirm">Bu içeriği devam et listesinden kaldırmak istiyor musun?</string>
+    <string name="cancel">İptal</string>
+    <string name="remove">Kaldır</string>
 </resources>

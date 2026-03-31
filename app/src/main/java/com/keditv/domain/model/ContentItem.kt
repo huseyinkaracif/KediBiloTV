@@ -7,5 +7,6 @@ data class ContentItem(
     val categoryId: String,
     val posterUrl: String?,
     val rating: String?,
+    val plot: String? = null,
     val streamUrl: String? = null
 )

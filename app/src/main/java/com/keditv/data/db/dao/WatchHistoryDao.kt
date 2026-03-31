@@ -9,7 +9,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WatchHistoryDao {
-    @Query("SELECT * FROM watch_history WHERE positionMs > 0 ORDER BY lastWatched DESC LIMIT 20")
+    @Query("""
+        SELECT * FROM watch_history
+        WHERE positionMs > 0
+          AND lastWatched = (
+              SELECT MAX(w2.lastWatched) FROM watch_history AS w2
+              WHERE w2.streamId = watch_history.streamId
+                AND w2.type = watch_history.type
+                AND w2.positionMs > 0
+          )
+        ORDER BY lastWatched DESC
+        LIMIT 20
+    """)
     fun getContinueWatching(): Flow<List<WatchHistoryEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

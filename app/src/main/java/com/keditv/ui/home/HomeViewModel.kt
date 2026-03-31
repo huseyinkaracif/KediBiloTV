@@ -44,7 +44,10 @@ class HomeViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
             contentRepository.getAllVod().fold(
                 onSuccess = { items ->
-                    val featured = items.filter { !it.posterUrl.isNullOrBlank() }.shuffled().take(5)
+                    val featured = items
+                        .filter { it.posterUrl?.startsWith("http", ignoreCase = true) == true }
+                        .shuffled()
+                        .take(5)
                     _state.value = _state.value.copy(isLoading = false, featuredItems = featured, error = null)
                 },
                 onFailure = {

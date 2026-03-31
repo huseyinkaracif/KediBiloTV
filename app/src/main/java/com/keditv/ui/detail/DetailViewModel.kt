@@ -71,8 +71,16 @@ class DetailViewModel @Inject constructor(
                     onFailure = { _state.value = _state.value.copy(isLoading = false, error = it.message) }
                 )
             } else {
+                val info = contentRepository.getStreamInfo(type, streamId)
                 _state.value = _state.value.copy(
-                    isLoading = false, isFavorite = isFav, watchHistory = history, error = null
+                    isLoading = false,
+                    isFavorite = isFav,
+                    watchHistory = history,
+                    error = null,
+                    name = info?.name?.takeIf { it.isNotBlank() } ?: _state.value.name,
+                    posterUrl = info?.posterUrl?.takeIf { it.startsWith("http") } ?: _state.value.posterUrl,
+                    rating = info?.rating,
+                    plot = info?.plot
                 )
             }
         }

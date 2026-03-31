@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlin.math.roundToInt
 import coil.compose.AsyncImage
 import com.keditv.R
 import com.keditv.domain.model.ContentType
@@ -338,16 +339,30 @@ private fun AnimatedFavoriteButton(isFavorite: Boolean, onToggle: () -> Unit) {
 
 @Composable
 private fun RatingBadge(rating: String) {
-    Surface(
-        shape = RoundedCornerShape(6.dp),
-        color = NeonCyan.copy(alpha = 0.1f),
-        modifier = Modifier.border(1.dp, NeonCyan.copy(alpha = 0.35f), RoundedCornerShape(6.dp))
+    val ratingFloat = rating.toFloatOrNull()?.coerceIn(0f, 10f) ?: return
+    val filledStars = (ratingFloat / 2f).roundToInt().coerceIn(0, 5)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(NeonCyan.copy(alpha = 0.1f))
+            .border(1.dp, NeonCyan.copy(alpha = 0.35f), RoundedCornerShape(6.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+            for (i in 1..5) {
+                Text(
+                    text = if (i <= filledStars) "★" else "☆",
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
+                    color = if (i <= filledStars) NeonCyan else NeonCyan.copy(alpha = 0.3f)
+                )
+            }
+        }
         Text(
-            text = "★ $rating",
-            style = MaterialTheme.typography.labelMedium,
-            color = NeonCyan,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            text = String.format("%.1f", ratingFloat),
+            style = MaterialTheme.typography.labelSmall,
+            color = NeonTextSecondary
         )
     }
 }

@@ -23,7 +23,7 @@ class ContentRepositoryImpl @Inject constructor(
                 ContentType.VOD -> api.getVodCategories()
                 ContentType.SERIES -> api.getSeriesCategories()
             }
-            val categories = dtos.map { Category(it.categoryId, it.categoryName, type, it.categoryImage?.takeIf { img -> img.isNotBlank() }) }
+            val categories = dtos.map { Category(it.categoryId, it.categoryName, type, it.categoryImage?.takeIf { img -> img.startsWith("http") }) }
             categoryCache[type] = categories
             Result.success(categories)
         } catch (e: Exception) {
@@ -43,7 +43,7 @@ class ContentRepositoryImpl @Inject constructor(
                     .map { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating) }
                 ContentType.VOD -> api.getVodStreams()
                     .filter { it.streamId != null && it.categoryId == categoryId }
-                    .map { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating) }
+                    .map { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating, it.plot) }
                 ContentType.SERIES -> api.getSeries()
                     .filter { it.seriesId != null && it.categoryId == categoryId }
                     .map { ContentItem(it.seriesId!!, it.name, type, it.categoryId ?: "", it.cover, it.rating) }
@@ -101,7 +101,7 @@ class ContentRepositoryImpl @Inject constructor(
                 ContentType.LIVE -> api.getLiveStreams().find { it.streamId == streamId }
                     ?.let { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating) }
                 ContentType.VOD -> api.getVodStreams().find { it.streamId == streamId }
-                    ?.let { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating) }
+                    ?.let { ContentItem(it.streamId!!, it.name, type, it.categoryId ?: "", it.streamIcon, it.rating, it.plot) }
                 ContentType.SERIES -> api.getSeries().find { it.seriesId == streamId }
                     ?.let { ContentItem(it.seriesId!!, it.name, type, it.categoryId ?: "", it.cover, it.rating) }
             }
@@ -113,7 +113,7 @@ class ContentRepositoryImpl @Inject constructor(
         return try {
             val items = api.getVodStreams()
                 .filter { it.streamId != null }
-                .map { ContentItem(it.streamId!!, it.name, ContentType.VOD, it.categoryId ?: "", it.streamIcon, it.rating) }
+                .map { ContentItem(it.streamId!!, it.name, ContentType.VOD, it.categoryId ?: "", it.streamIcon, it.rating, it.plot) }
             contentCache["ALL_VOD"] = items
             Result.success(items)
         } catch (e: Exception) {

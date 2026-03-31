@@ -35,7 +35,7 @@ class WatchHistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProgress(streamId: Int, episodeId: Int?): WatchHistory? {
-        return dao.getProgress(streamId, episodeId ?: 0)?.toDomain()
+        return dao.getProgress(streamId, episodeId ?: -1)?.toDomain()
     }
 
     override suspend fun delete(streamId: Int, type: ContentType, episodeId: Int?) {
