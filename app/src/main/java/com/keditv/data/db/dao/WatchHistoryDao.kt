@@ -17,4 +17,7 @@ interface WatchHistoryDao {
 
     @Query("SELECT * FROM watch_history WHERE streamId = :streamId AND episodeId = :episodeId")
     suspend fun getProgress(streamId: Int, episodeId: Int = -1): WatchHistoryEntity?
+
+    @Query("DELETE FROM watch_history WHERE streamId = :streamId AND type = :type AND episodeId = :episodeId")
+    suspend fun delete(streamId: Int, type: String, episodeId: Int = -1)
 }

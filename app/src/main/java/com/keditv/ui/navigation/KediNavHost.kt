@@ -41,6 +41,8 @@ fun KediNavHost(
         ) {
             CategoryScreen(
                 onNavigateToContent = { t, cId -> navController.navigate(NavRoutes.content(t, cId)) },
+                onNavigateToPlayer = { t, id -> navController.navigate(NavRoutes.player(t, id)) },
+                onNavigateToDetail = { t, id -> navController.navigate(NavRoutes.detail(t, id)) },
                 onBack = { navController.popBackStack() }
             )
         }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.PlayArrow
@@ -26,11 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ import coil.compose.AsyncImage
 import com.keditv.R
 import com.keditv.domain.model.ContentItem
 import com.keditv.domain.model.ContentType
+import com.keditv.domain.model.Favorite
 import com.keditv.domain.model.WatchHistory
 import com.keditv.ui.common.ContentCard
 import com.keditv.ui.theme.*
@@ -49,6 +52,7 @@ fun HomeMobileContent(
     onCategoryClick: (String) -> Unit,
     onItemClick: (String, Int) -> Unit,
     onContinueClick: (String, Int, Int?) -> Unit,
+    onDeleteFromHistory: (WatchHistory) -> Unit,
     onSettingsClick: () -> Unit
 ) {
     // Staggered entrance state
@@ -144,7 +148,8 @@ fun HomeMobileContent(
                                     history = history,
                                     onClick = {
                                         onContinueClick(history.type.name, history.streamId, history.episodeId)
-                                    }
+                                    },
+                                    onLongClick = { onDeleteFromHistory(history) }
                                 )
                             }
                         }
@@ -161,7 +166,11 @@ fun HomeMobileContent(
                             .alpha(sectionsAlpha)
                             .offset(y = sectionsSlide.dp)
                     ) {
-                        SectionHeader(title = stringResource(R.string.favorites), icon = null)
+                        SectionHeader(
+                            title = stringResource(R.string.favorites),
+                            icon = Icons.Default.Favorite,
+                            iconTint = NeonFuchsia
+                        )
                     }
                 }
                 item {
@@ -175,7 +184,7 @@ fun HomeMobileContent(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(state.favorites) { fav ->
-                                ContentCard(
+                                FavoriteCard(
                                     name = fav.name,
                                     posterUrl = fav.posterUrl,
                                     onClick = { onItemClick(fav.type.name, fav.streamId) }
@@ -451,7 +460,7 @@ private fun ContentTypeTab(
 // ─────────────────────────────────────────────────────────────────
 
 @Composable
-private fun ContinueWatchingCard(history: WatchHistory, onClick: () -> Unit) {
+private fun ContinueWatchingCard(history: WatchHistory, onClick: () -> Unit, onLongClick: () -> Unit) {
     val progress = if (history.durationMs > 0) {
         (history.positionMs.toFloat() / history.durationMs.toFloat()).coerceIn(0f, 1f)
     } else null
@@ -464,7 +473,8 @@ private fun ContinueWatchingCard(history: WatchHistory, onClick: () -> Unit) {
         posterUrl = history.posterUrl?.takeIf { it.isNotBlank() },
         progress = progress,
         subtitle = subtitle,
-        onClick = onClick
+        onClick = onClick,
+        onLongClick = onLongClick
     )
 }
 
@@ -473,7 +483,7 @@ private fun ContinueWatchingCard(history: WatchHistory, onClick: () -> Unit) {
 // ─────────────────────────────────────────────────────────────────
 
 @Composable
-private fun SectionHeader(title: String, icon: ImageVector?) {
+private fun SectionHeader(title: String, icon: ImageVector?, iconTint: Color = NeonCoral) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -483,7 +493,7 @@ private fun SectionHeader(title: String, icon: ImageVector?) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = NeonCoral,
+                tint = iconTint,
                 modifier = Modifier.size(18.dp)
             )
         } else {
@@ -499,6 +509,82 @@ private fun SectionHeader(title: String, icon: ImageVector?) {
             style = MaterialTheme.typography.titleMedium,
             color = NeonTextPrimary
         )
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Favori Kartı — kalp badge ile
+// ─────────────────────────────────────────────────────────────────
+
+@Composable
+private fun FavoriteCard(name: String, posterUrl: String?, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.93f else 1f,
+        animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh),
+        label = "fav_scale"
+    )
+
+    Box(
+        modifier = Modifier
+            .width(130.dp)
+            .scale(scale)
+            .clip(RoundedCornerShape(12.dp))
+            .background(NeonSurface)
+            .border(
+                1.dp,
+                Brush.verticalGradient(listOf(NeonFuchsia.copy(alpha = 0.4f), NeonFuchsia.copy(alpha = 0f))),
+                RoundedCornerShape(12.dp)
+            )
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
+    ) {
+        Column {
+            Box {
+                AsyncImage(
+                    model = posterUrl,
+                    contentDescription = name,
+                    modifier = Modifier.fillMaxWidth().height(185.dp),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.ic_cat_placeholder),
+                    error = painterResource(R.drawable.ic_cat_placeholder)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(listOf(Color.Transparent, NeonSurface.copy(alpha = 0.9f)))
+                        )
+                )
+                // Kalp badge
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(6.dp)
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(NeonFuchsia.copy(alpha = 0.85f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Favorite,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+            }
+            Text(
+                text = name,
+                style = MaterialTheme.typography.labelMedium,
+                color = NeonTextPrimary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+            )
+        }
     }
 }
 

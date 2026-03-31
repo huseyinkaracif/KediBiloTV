@@ -19,6 +19,8 @@ data class PlayerUiState(
     val contentType: ContentType = ContentType.LIVE,
     val streamId: Int = 0,
     val episodeId: Int? = null,
+    val contentName: String = "",
+    val contentPosterUrl: String? = null,
     val error: String? = null
 )
 
@@ -48,20 +50,23 @@ class PlayerViewModel @Inject constructor(
             }
 
             val history = watchHistoryRepository.getProgress(streamId, episodeId)
+            val info = contentRepository.getStreamInfo(type, streamId)
             _state.value = _state.value.copy(
                 streamUrl = url,
-                startPositionMs = history?.positionMs ?: 0
+                startPositionMs = history?.positionMs ?: 0,
+                contentName = history?.name?.takeIf { it.isNotBlank() } ?: info?.name ?: "",
+                contentPosterUrl = history?.posterUrl ?: info?.posterUrl
             )
         }
     }
 
-    fun saveProgress(positionMs: Long, durationMs: Long, name: String, posterUrl: String?) {
+    fun saveProgress(positionMs: Long, durationMs: Long) {
         viewModelScope.launch {
             saveProgressUseCase(
                 streamId = streamId,
                 type = type,
-                name = name,
-                posterUrl = posterUrl,
+                name = _state.value.contentName,
+                posterUrl = _state.value.contentPosterUrl,
                 positionMs = positionMs,
                 durationMs = durationMs,
                 episodeId = episodeId

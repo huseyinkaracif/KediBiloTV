@@ -38,6 +38,10 @@ class WatchHistoryRepositoryImpl @Inject constructor(
         return dao.getProgress(streamId, episodeId ?: 0)?.toDomain()
     }
 
+    override suspend fun delete(streamId: Int, type: ContentType, episodeId: Int?) {
+        dao.delete(streamId, type.name, episodeId ?: -1)
+    }
+
     private fun WatchHistoryEntity.toDomain() = WatchHistory(
         streamId = streamId,
         type = ContentType.valueOf(type),

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.keditv.domain.model.*
 import com.keditv.domain.repository.ContentRepository
 import com.keditv.domain.repository.FavoriteRepository
+import com.keditv.domain.repository.WatchHistoryRepository
 import com.keditv.domain.usecase.GetContinueWatchingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -24,6 +25,7 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val watchHistoryRepository: WatchHistoryRepository,
     private val getContinueWatching: GetContinueWatchingUseCase
 ) : ViewModel() {
 
@@ -42,7 +44,7 @@ class HomeViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
             contentRepository.getAllVod().fold(
                 onSuccess = { items ->
-                    val featured = items.shuffled().take(5)
+                    val featured = items.filter { !it.posterUrl.isNullOrBlank() }.shuffled().take(5)
                     _state.value = _state.value.copy(isLoading = false, featuredItems = featured, error = null)
                 },
                 onFailure = {
@@ -75,6 +77,12 @@ class HomeViewModel @Inject constructor(
         favoriteRepository.getAllFavorites().onEach { list ->
             _state.value = _state.value.copy(favorites = list)
         }.launchIn(viewModelScope)
+    }
+
+    fun deleteFromHistory(history: WatchHistory) {
+        viewModelScope.launch {
+            watchHistoryRepository.delete(history.streamId, history.type, history.episodeId)
+        }
     }
 
     fun retry() = loadHome()

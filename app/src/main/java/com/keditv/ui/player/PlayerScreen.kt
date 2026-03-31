@@ -35,7 +35,7 @@ fun PlayerScreen(
             val pos = player.currentPosition
             val dur = player.duration
             if (dur > 0) {
-                viewModel.saveProgress(pos, dur, "", null)
+                viewModel.saveProgress(pos, dur)
             }
             player.release()
         }

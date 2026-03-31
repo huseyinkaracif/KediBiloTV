@@ -34,12 +34,17 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.keditv.R
+import com.keditv.domain.model.Category
+import com.keditv.domain.model.ContentItem
 import com.keditv.domain.model.ContentType
 import com.keditv.ui.common.EmptyState
 import com.keditv.ui.common.ErrorState
@@ -50,6 +55,8 @@ import com.keditv.ui.theme.*
 @Composable
 fun CategoryScreen(
     onNavigateToContent: (String, String) -> Unit,
+    onNavigateToPlayer: (String, Int) -> Unit,
+    onNavigateToDetail: (String, Int) -> Unit,
     onBack: () -> Unit,
     viewModel: CategoryViewModel = hiltViewModel()
 ) {
@@ -79,7 +86,7 @@ fun CategoryScreen(
                         TextField(
                             value = state.searchQuery,
                             onValueChange = viewModel::search,
-                            placeholder = { Text(stringResource(R.string.search_categories), color = NeonTextMuted) },
+                            placeholder = { Text(stringResource(R.string.search_hint), color = NeonTextMuted) },
                             singleLine = true,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -123,12 +130,49 @@ fun CategoryScreen(
         when {
             state.isLoading -> LoadingIndicator()
             state.error != null -> ErrorState(state.error!!, viewModel::retry)
-            state.filteredCategories.isEmpty() -> EmptyState(
-                if (state.searchQuery.isNotBlank())
-                    "\"${state.searchQuery}\" ${stringResource(R.string.no_results)}"
-                else
-                    stringResource(R.string.no_content)
-            )
+            // Arama modunda içerik sonuçları göster
+            searchVisible && state.searchQuery.isNotBlank() -> {
+                when {
+                    state.isSearchingContent -> LoadingIndicator()
+                    state.contentSearchResults.isEmpty() -> EmptyState(
+                        "\"${state.searchQuery}\" ${stringResource(R.string.no_results)}"
+                    )
+                    else -> {
+                        var gridVisible by remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) { gridVisible = true }
+                        val gridAlpha by animateFloatAsState(
+                            targetValue = if (gridVisible) 1f else 0f,
+                            animationSpec = tween(400, easing = FastOutSlowInEasing),
+                            label = "grid_alpha"
+                        )
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(140.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .alpha(gridAlpha)
+                                .padding(padding)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(state.contentSearchResults) { item ->
+                                ContentSearchCard(
+                                    item = item,
+                                    onClick = {
+                                        if (item.type == ContentType.LIVE) {
+                                            onNavigateToPlayer(item.type.name, item.streamId)
+                                        } else {
+                                            onNavigateToDetail(item.type.name, item.streamId)
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            // Normal kategori listesi
+            state.filteredCategories.isEmpty() -> EmptyState(stringResource(R.string.no_content))
             else -> {
                 var gridVisible by remember { mutableStateOf(false) }
                 LaunchedEffect(Unit) { gridVisible = true }
@@ -150,7 +194,7 @@ fun CategoryScreen(
                 ) {
                     items(state.filteredCategories) { category ->
                         CategoryCard(
-                            name = category.name,
+                            category = category,
                             onClick = { onNavigateToContent(state.contentType.name, category.id) }
                         )
                     }
@@ -161,7 +205,46 @@ fun CategoryScreen(
 }
 
 @Composable
-private fun CategoryCard(name: String, onClick: () -> Unit) {
+private fun ContentSearchCard(item: ContentItem, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.93f else 1f,
+        animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh),
+        label = "search_card_scale"
+    )
+
+    Box(
+        modifier = Modifier
+            .width(140.dp)
+            .scale(scale)
+            .clip(RoundedCornerShape(12.dp))
+            .background(NeonSurface)
+            .border(1.dp, NeonCyan.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
+    ) {
+        Column {
+            AsyncImage(
+                model = item.posterUrl,
+                contentDescription = item.name,
+                modifier = Modifier.fillMaxWidth().height(190.dp),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.ic_cat_placeholder),
+                error = painterResource(R.drawable.ic_cat_placeholder)
+            )
+            Text(
+                text = item.name,
+                style = MaterialTheme.typography.labelMedium,
+                color = NeonTextPrimary,
+                maxLines = 2,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryCard(category: Category, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -173,9 +256,11 @@ private fun CategoryCard(name: String, onClick: () -> Unit) {
         label = "card_scale"
     )
 
+    val hasImage = !category.imageUrl.isNullOrBlank()
+
     Box(
         modifier = Modifier
-            .height(72.dp)
+            .height(if (hasImage) 100.dp else 72.dp)
             .scale(scale)
             .clip(RoundedCornerShape(12.dp))
             .background(NeonSurface)
@@ -190,14 +275,33 @@ private fun CategoryCard(name: String, onClick: () -> Unit) {
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
+            )
     ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleSmall,
-            color = NeonTextPrimary,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
+        if (hasImage) {
+            AsyncImage(
+                model = category.imageUrl,
+                contentDescription = category.name,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                error = painterResource(R.drawable.ic_cat_placeholder)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(NeonBackground.copy(alpha = 0.1f), NeonBackground.copy(alpha = 0.7f))
+                        )
+                    )
+            )
+        }
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = category.name,
+                style = MaterialTheme.typography.titleSmall,
+                color = NeonTextPrimary,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+        }
     }
 }

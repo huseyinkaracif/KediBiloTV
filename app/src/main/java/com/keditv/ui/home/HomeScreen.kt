@@ -34,6 +34,7 @@ fun HomeScreen(
                     onCategoryClick = onNavigateToCategory,
                     onItemClick = onNavigateToDetail,
                     onContinueClick = onNavigateToPlayer,
+                    onDeleteFromHistory = viewModel::deleteFromHistory,
                     onSettingsClick = onNavigateToSettings
                 )
             }
