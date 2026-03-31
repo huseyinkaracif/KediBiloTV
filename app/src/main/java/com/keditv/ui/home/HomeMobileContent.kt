@@ -468,14 +468,45 @@ private fun ContinueWatchingCard(history: WatchHistory, onClick: () -> Unit, onL
     val displayName = history.name.takeIf { it.isNotBlank() } ?: "İsimsiz"
     val subtitle = history.episodeTitle?.takeIf { it.isNotBlank() }
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     ContentCard(
         name = displayName,
         posterUrl = history.posterUrl?.takeIf { it.isNotBlank() },
         progress = progress,
         subtitle = subtitle,
         onClick = onClick,
-        onLongClick = onLongClick
+        onLongClick = { showDeleteDialog = true }
     )
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = {
+                Text(stringResource(R.string.remove_from_history))
+            },
+            text = {
+                Text(stringResource(R.string.remove_from_history_confirm))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onLongClick()
+                    }
+                ) {
+                    Text(stringResource(R.string.remove))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────
