@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -296,7 +297,7 @@ private fun TvPlayButton(onClick: () -> Unit) {
 
     Row(
         modifier = Modifier
-            .scale(scale)
+            .graphicsLayer { val s = scale; scaleX = s; scaleY = s }
             .clip(RoundedCornerShape(8.dp))
             .background(if (isFocused) NeonCoralLight else NeonCoral)
             .border(2.dp, if (isFocused) NeonCyan else Color.Transparent, RoundedCornerShape(8.dp))
@@ -363,7 +364,7 @@ private fun TvNavButton(
     Column(
         modifier = modifier
             .height(90.dp)
-            .scale(scale)
+            .graphicsLayer { val s = scale; scaleX = s; scaleY = s }
             .clip(RoundedCornerShape(14.dp))
             .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
             .border(

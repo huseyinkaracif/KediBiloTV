@@ -26,9 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -65,24 +65,25 @@ fun HomeMobileContent(
         sectionsVisible = true
     }
 
+    // graphicsLayer kullanarak draw-phase animasyonu — layout recomposition yok
     val tabsAlpha by animateFloatAsState(
         if (tabsVisible) 1f else 0f,
-        tween(400, easing = FastOutSlowInEasing),
+        tween(350, easing = FastOutSlowInEasing),
         label = "tabs_alpha"
     )
-    val tabsSlide by animateFloatAsState(
-        if (tabsVisible) 0f else 24f,
-        tween(400, easing = FastOutSlowInEasing),
+    val tabsTranslation by animateFloatAsState(
+        if (tabsVisible) 0f else 60f,
+        tween(350, easing = FastOutSlowInEasing),
         label = "tabs_slide"
     )
     val sectionsAlpha by animateFloatAsState(
         if (sectionsVisible) 1f else 0f,
-        tween(500, easing = FastOutSlowInEasing),
+        tween(400, easing = FastOutSlowInEasing),
         label = "sections_alpha"
     )
-    val sectionsSlide by animateFloatAsState(
-        if (sectionsVisible) 0f else 20f,
-        tween(500, easing = FastOutSlowInEasing),
+    val sectionsTranslation by animateFloatAsState(
+        if (sectionsVisible) 0f else 50f,
+        tween(400, easing = FastOutSlowInEasing),
         label = "sections_slide"
     )
 
@@ -108,50 +109,46 @@ fun HomeMobileContent(
                 item { Spacer(Modifier.height(80.dp)) }
             }
 
-            // İçerik türü sekmeleri — slide in from below
+            // İçerik türü sekmeleri — draw-phase animasyonu
             item {
-                Box(
-                    modifier = Modifier
-                        .alpha(tabsAlpha)
-                        .offset(y = tabsSlide.dp)
-                ) {
-                    ContentTypeTabs(onCategoryClick = onCategoryClick)
-                }
+                ContentTypeTabs(
+                    onCategoryClick = onCategoryClick,
+                    modifier = Modifier.graphicsLayer {
+                        alpha = tabsAlpha
+                        translationY = tabsTranslation
+                    }
+                )
             }
 
             // Devam Et
             if (state.continueWatching.isNotEmpty()) {
                 item {
-                    Box(
-                        modifier = Modifier
-                            .alpha(sectionsAlpha)
-                            .offset(y = sectionsSlide.dp)
-                    ) {
-                        SectionHeader(
-                            title = stringResource(R.string.continue_watching),
-                            icon = Icons.Default.PlayArrow
-                        )
-                    }
+                    SectionHeader(
+                        title = stringResource(R.string.continue_watching),
+                        icon = Icons.Default.PlayArrow,
+                        modifier = Modifier.graphicsLayer {
+                            alpha = sectionsAlpha
+                            translationY = sectionsTranslation
+                        }
+                    )
                 }
                 item {
-                    Box(
-                        modifier = Modifier
-                            .alpha(sectionsAlpha)
-                            .offset(y = sectionsSlide.dp)
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.graphicsLayer {
+                            alpha = sectionsAlpha
+                            translationY = sectionsTranslation
+                        }
                     ) {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(state.continueWatching) { history ->
-                                ContinueWatchingCard(
-                                    history = history,
-                                    onClick = {
-                                        onContinueClick(history.type.name, history.streamId, history.episodeId)
-                                    },
-                                    onLongClick = { onDeleteFromHistory(history) }
-                                )
-                            }
+                        items(state.continueWatching, key = { "cw_${it.streamId}_${it.episodeId}" }) { history ->
+                            ContinueWatchingCard(
+                                history = history,
+                                onClick = {
+                                    onContinueClick(history.type.name, history.streamId, history.episodeId)
+                                },
+                                onLongClick = { onDeleteFromHistory(history) }
+                            )
                         }
                     }
                 }
@@ -161,35 +158,31 @@ fun HomeMobileContent(
             // Favoriler
             if (state.favorites.isNotEmpty()) {
                 item {
-                    Box(
-                        modifier = Modifier
-                            .alpha(sectionsAlpha)
-                            .offset(y = sectionsSlide.dp)
-                    ) {
-                        SectionHeader(
-                            title = stringResource(R.string.favorites),
-                            icon = Icons.Default.Favorite,
-                            iconTint = NeonFuchsia
-                        )
-                    }
+                    SectionHeader(
+                        title = stringResource(R.string.favorites),
+                        icon = Icons.Default.Favorite,
+                        iconTint = NeonFuchsia,
+                        modifier = Modifier.graphicsLayer {
+                            alpha = sectionsAlpha
+                            translationY = sectionsTranslation
+                        }
+                    )
                 }
                 item {
-                    Box(
-                        modifier = Modifier
-                            .alpha(sectionsAlpha)
-                            .offset(y = sectionsSlide.dp)
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.graphicsLayer {
+                            alpha = sectionsAlpha
+                            translationY = sectionsTranslation
+                        }
                     ) {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(state.favorites) { fav ->
-                                FavoriteCard(
-                                    name = fav.name,
-                                    posterUrl = fav.posterUrl,
-                                    onClick = { onItemClick(fav.type.name, fav.streamId) }
-                                )
-                            }
+                        items(state.favorites, key = { "fav_${it.streamId}" }) { fav ->
+                            FavoriteCard(
+                                name = fav.name,
+                                posterUrl = fav.posterUrl,
+                                onClick = { onItemClick(fav.type.name, fav.streamId) }
+                            )
                         }
                     }
                 }
@@ -223,8 +216,7 @@ private fun HeroBanner(
         AnimatedContent(
             targetState = currentIndex,
             transitionSpec = {
-                (fadeIn(tween(700)) + scaleIn(tween(700), initialScale = 1.04f)) togetherWith
-                        fadeOut(tween(450))
+                (fadeIn(tween(500)) togetherWith fadeOut(tween(350)))
             },
             modifier = Modifier.fillMaxSize(),
             label = "hero_content"
@@ -368,9 +360,9 @@ private fun HeroBanner(
 // ─────────────────────────────────────────────────────────────────
 
 @Composable
-private fun ContentTypeTabs(onCategoryClick: (String) -> Unit) {
+private fun ContentTypeTabs(onCategoryClick: (String) -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -421,7 +413,11 @@ private fun ContentTypeTab(
     Box(
         modifier = modifier
             .height(72.dp)
-            .scale(scale)
+            .graphicsLayer {
+                val s = scale
+                scaleX = s
+                scaleY = s
+            }
             .clip(RoundedCornerShape(12.dp))
             .background(NeonSurface)
             .border(
@@ -514,9 +510,9 @@ private fun ContinueWatchingCard(history: WatchHistory, onClick: () -> Unit, onL
 // ─────────────────────────────────────────────────────────────────
 
 @Composable
-private fun SectionHeader(title: String, icon: ImageVector?, iconTint: Color = NeonCoral) {
+private fun SectionHeader(title: String, icon: ImageVector?, iconTint: Color = NeonCoral, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -560,7 +556,11 @@ private fun FavoriteCard(name: String, posterUrl: String?, onClick: () -> Unit) 
     Box(
         modifier = Modifier
             .width(130.dp)
-            .scale(scale)
+            .graphicsLayer {
+                val s = scale
+                scaleX = s
+                scaleY = s
+            }
             .clip(RoundedCornerShape(12.dp))
             .background(NeonSurface)
             .border(

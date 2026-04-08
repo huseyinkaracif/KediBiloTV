@@ -22,9 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -71,7 +71,11 @@ fun ContentCard(
     Box(
         modifier = modifier
             .width(140.dp)
-            .scale(scale)
+            .graphicsLayer {
+                val s = scale
+                scaleX = s
+                scaleY = s
+            }
             .clip(cardShape)
             .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
             .then(

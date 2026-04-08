@@ -30,11 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -236,7 +236,7 @@ private fun ContentSearchCard(item: ContentItem, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .width(140.dp)
-            .scale(scale)
+            .graphicsLayer { val s = scale; scaleX = s; scaleY = s }
             .clip(RoundedCornerShape(12.dp))
             .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
             .then(
@@ -289,7 +289,7 @@ private fun CategoryCard(category: Category, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .height(if (hasImage) 100.dp else 72.dp)
-            .scale(scale)
+            .graphicsLayer { val s = scale; scaleX = s; scaleY = s }
             .clip(RoundedCornerShape(12.dp))
             .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
             .then(
