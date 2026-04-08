@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -49,6 +50,7 @@ import com.keditv.domain.model.ContentType
 import com.keditv.ui.common.EmptyState
 import com.keditv.ui.common.ErrorState
 import com.keditv.ui.common.LoadingIndicator
+import com.keditv.ui.common.isTV
 import com.keditv.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,8 +64,10 @@ fun CategoryScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var searchVisible by remember { mutableStateOf(false) }
+    var searchDraft by remember(searchVisible) { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+    val isTv = isTV()
 
     val title = when (state.contentType) {
         ContentType.LIVE -> stringResource(R.string.live_tv)
@@ -75,6 +79,11 @@ fun CategoryScreen(
         if (searchVisible) focusRequester.requestFocus()
     }
 
+    fun commitSearch() {
+        viewModel.search(searchDraft)
+        focusManager.clearFocus()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,8 +93,8 @@ fun CategoryScreen(
                     }
                     AnimatedVisibility(visible = searchVisible, enter = fadeIn(), exit = fadeOut()) {
                         TextField(
-                            value = state.searchQuery,
-                            onValueChange = viewModel::search,
+                            value = searchDraft,
+                            onValueChange = { searchDraft = it; if (!isTv) viewModel.search(it) },
                             placeholder = { Text(stringResource(R.string.search_hint), color = NeonTextMuted) },
                             singleLine = true,
                             modifier = Modifier
@@ -101,7 +110,7 @@ fun CategoryScreen(
                                 unfocusedIndicatorColor = NeonSurfaceRim
                             ),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
+                            keyboardActions = KeyboardActions(onSearch = { commitSearch() })
                         )
                     }
                 },
@@ -111,9 +120,14 @@ fun CategoryScreen(
                     }
                 },
                 actions = {
+                    if (searchVisible && isTv) {
+                        TextButton(onClick = { commitSearch() }) {
+                            Text(stringResource(R.string.search), color = NeonCyan, style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
                     IconButton(onClick = {
                         searchVisible = !searchVisible
-                        if (!searchVisible) viewModel.search("")
+                        if (!searchVisible) { viewModel.search(""); searchDraft = "" }
                     }) {
                         Icon(
                             if (searchVisible) Icons.Default.Close else Icons.Default.Search,
@@ -155,7 +169,7 @@ fun CategoryScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(state.contentSearchResults) { item ->
+                            items(state.contentSearchResults, key = { it.streamId }) { item ->
                                 ContentSearchCard(
                                     item = item,
                                     onClick = {
@@ -192,7 +206,7 @@ fun CategoryScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(state.filteredCategories) { category ->
+                    items(state.filteredCategories, key = { it.id }) { category ->
                         CategoryCard(
                             category = category,
                             onClick = { onNavigateToContent(state.contentType.name, category.id) }
@@ -208,8 +222,13 @@ fun CategoryScreen(
 private fun ContentSearchCard(item: ContentItem, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.93f else 1f,
+        targetValue = when {
+            isFocused -> 1.06f
+            isPressed -> 0.93f
+            else -> 1f
+        },
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh),
         label = "search_card_scale"
     )
@@ -219,8 +238,12 @@ private fun ContentSearchCard(item: ContentItem, onClick: () -> Unit) {
             .width(140.dp)
             .scale(scale)
             .clip(RoundedCornerShape(12.dp))
-            .background(NeonSurface)
-            .border(1.dp, NeonCyan.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+            .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
+            .then(
+                if (isFocused) Modifier.border(2.dp, NeonCyan, RoundedCornerShape(12.dp))
+                else Modifier.border(1.dp, NeonCyan.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+            )
+            .onFocusChanged { isFocused = it.isFocused }
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
     ) {
         Column {
@@ -247,8 +270,13 @@ private fun ContentSearchCard(item: ContentItem, onClick: () -> Unit) {
 private fun CategoryCard(category: Category, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.93f else 1f,
+        targetValue = when {
+            isFocused -> 1.05f
+            isPressed -> 0.93f
+            else -> 1f
+        },
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessHigh
@@ -263,14 +291,12 @@ private fun CategoryCard(category: Category, onClick: () -> Unit) {
             .height(if (hasImage) 100.dp else 72.dp)
             .scale(scale)
             .clip(RoundedCornerShape(12.dp))
-            .background(NeonSurface)
-            .border(
-                width = 1.dp,
-                brush = Brush.horizontalGradient(
-                    listOf(NeonCoral.copy(alpha = 0.4f), NeonSurfaceRim.copy(alpha = 0.3f))
-                ),
-                shape = RoundedCornerShape(12.dp)
+            .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
+            .then(
+                if (isFocused) Modifier.border(2.dp, NeonCyan, RoundedCornerShape(12.dp))
+                else Modifier.border(1.dp, Brush.horizontalGradient(listOf(NeonCoral.copy(alpha = 0.4f), NeonSurfaceRim.copy(alpha = 0.3f))), RoundedCornerShape(12.dp))
             )
+            .onFocusChanged { isFocused = it.isFocused }
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,

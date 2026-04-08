@@ -16,11 +16,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -31,6 +34,7 @@ import com.keditv.R
 import com.keditv.ui.theme.NeonCoral
 import com.keditv.ui.theme.NeonCyan
 import com.keditv.ui.theme.NeonSurface
+import com.keditv.ui.theme.NeonSurfaceHigh
 import com.keditv.ui.theme.NeonSurfaceRim
 import com.keditv.ui.theme.NeonTextPrimary
 import com.keditv.ui.theme.NeonTextSecondary
@@ -50,8 +54,13 @@ fun ContentCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.93f else 1f,
+        targetValue = when {
+            isFocused -> 1.08f
+            isPressed -> 0.93f
+            else -> 1f
+        },
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessHigh
@@ -64,14 +73,12 @@ fun ContentCard(
             .width(140.dp)
             .scale(scale)
             .clip(cardShape)
-            .background(NeonSurface)
-            .border(
-                width = 1.dp,
-                brush = Brush.verticalGradient(
-                    listOf(NeonCyan.copy(alpha = 0.25f), NeonCyan.copy(alpha = 0f))
-                ),
-                shape = cardShape
+            .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
+            .then(
+                if (isFocused) Modifier.border(2.dp, NeonCyan, cardShape)
+                else Modifier.border(1.dp, Brush.verticalGradient(listOf(NeonCyan.copy(alpha = 0.25f), NeonCyan.copy(alpha = 0f))), cardShape)
             )
+            .onFocusChanged { isFocused = it.isFocused }
             .combinedClickable(
                 interactionSource = interactionSource,
                 indication = null,
