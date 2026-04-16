@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.tv.foundation.lazy.list.TvLazyColumn
+import androidx.tv.foundation.lazy.list.items as tvItems
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -26,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -104,7 +106,7 @@ private fun DetailContent(
         runCatching { playFocusRequester.requestFocus() }
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    TvLazyColumn(modifier = Modifier.fillMaxSize()) {
         // ── Poster hero ──
         item {
             Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
@@ -257,7 +259,7 @@ private fun DetailContent(
 
                 val currentSeason = info.seasons.find { it.seasonNumber == state.selectedSeason }
                 currentSeason?.episodes?.let { episodes ->
-                    items(episodes) { episode ->
+                    tvItems(episodes) { episode ->
                         EpisodeCard(
                             number = episode.episodeNumber,
                             title = episode.title,
@@ -272,6 +274,8 @@ private fun DetailContent(
         item { Spacer(Modifier.height(40.dp)) }
     }
 }
+
+@Suppress("UNUSED_PARAMETER")
 
 // ─────────────────────────────────────────────────────────────────
 // Animated Favorite Button — paw burst on favorite
@@ -384,8 +388,13 @@ private fun RatingBadge(rating: String) {
 private fun EpisodeCard(number: Int, title: String, duration: String?, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1f,
+        targetValue = when {
+            isFocused -> 1.04f
+            isPressed -> 0.97f
+            else -> 1f
+        },
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh),
         label = "ep_scale"
     )
@@ -396,10 +405,14 @@ private fun EpisodeCard(number: Int, title: String, duration: String?, onClick: 
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .scale(scale)
             .clip(RoundedCornerShape(10.dp))
-            .background(NeonSurface)
-            .border(1.dp, NeonSurfaceRim, RoundedCornerShape(10.dp))
+            .background(if (isFocused) NeonSurfaceHigh else NeonSurface)
+            .border(
+                width = if (isFocused) 2.dp else 1.dp,
+                color = if (isFocused) NeonCyan else NeonSurfaceRim,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .onFocusChanged { isFocused = it.isFocused }
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
-            .focusable(interactionSource = interactionSource)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -411,6 +424,6 @@ private fun EpisodeCard(number: Int, title: String, duration: String?, onClick: 
                 Text(duration, style = MaterialTheme.typography.bodySmall, color = NeonTextMuted)
             }
         }
-        Icon(Icons.Default.PlayArrow, null, tint = NeonTextMuted, modifier = Modifier.size(18.dp))
+        Icon(Icons.Default.PlayArrow, null, tint = if (isFocused) NeonCyan else NeonTextMuted, modifier = Modifier.size(18.dp))
     }
 }
