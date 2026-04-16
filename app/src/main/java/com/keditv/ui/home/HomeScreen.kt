@@ -26,7 +26,9 @@ fun HomeScreen(
                     onCategoryClick = onNavigateToCategory,
                     onItemClick = onNavigateToDetail,
                     onContinueClick = onNavigateToPlayer,
-                    onSettingsClick = onNavigateToSettings
+                    onSettingsClick = onNavigateToSettings,
+                    onRemoveFromHistory = viewModel::deleteFromHistory,
+                    onRemoveFromFavorites = viewModel::removeFromFavorites
                 )
             } else {
                 HomeMobileContent(

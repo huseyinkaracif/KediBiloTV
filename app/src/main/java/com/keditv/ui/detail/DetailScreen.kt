@@ -24,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -95,6 +98,11 @@ private fun DetailContent(
     onSelectSeason: (Int) -> Unit
 ) {
     val hasProgress = state.watchHistory != null && state.watchHistory.positionMs > 0
+    val playFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        runCatching { playFocusRequester.requestFocus() }
+    }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         // ── Poster hero ──
@@ -184,7 +192,8 @@ private fun DetailContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
-                        .height(52.dp),
+                        .height(52.dp)
+                        .focusRequester(playFocusRequester),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = NeonCoral)
                 ) {
@@ -390,6 +399,7 @@ private fun EpisodeCard(number: Int, title: String, duration: String?, onClick: 
             .background(NeonSurface)
             .border(1.dp, NeonSurfaceRim, RoundedCornerShape(10.dp))
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
+            .focusable(interactionSource = interactionSource)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)

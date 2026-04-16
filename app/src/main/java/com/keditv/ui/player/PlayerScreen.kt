@@ -2,8 +2,10 @@ package com.keditv.ui.player
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.view.KeyEvent as AndroidKeyEvent
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,6 +47,13 @@ fun PlayerScreen(
     val activity = context as? Activity
 
     val player = remember { KediPlayer.create(context) }
+    val playerViewRef = remember { mutableStateOf<PlayerView?>(null) }
+    var isHudVisible by remember { mutableStateOf(false) }
+
+    // İlk back → HUD'u kapat; HUD zaten kapalıysa → ekrandan çık
+    BackHandler(enabled = isHudVisible) {
+        playerViewRef.value?.hideController()
+    }
 
     var showTrackSheet by remember { mutableStateOf(false) }
     var audioTracks by remember { mutableStateOf<List<TrackInfo>>(emptyList()) }
@@ -105,7 +114,34 @@ fun PlayerScreen(
                     )
                     useController = true
                     setShowBuffering(PlayerView.SHOW_BUFFERING_WHEN_PLAYING)
+                    isFocusable = true
+                    isFocusableInTouchMode = true
+                    // Kumanda sol/sağ → 10 sn geri/ileri sar
+                    setOnKeyListener { _, keyCode, event ->
+                        if (event.action == AndroidKeyEvent.ACTION_DOWN) {
+                            when (keyCode) {
+                                AndroidKeyEvent.KEYCODE_DPAD_LEFT -> {
+                                    player.seekTo(maxOf(0L, player.currentPosition - 10_000L))
+                                    true
+                                }
+                                AndroidKeyEvent.KEYCODE_DPAD_RIGHT -> {
+                                    val dur = player.duration
+                                    player.seekTo(if (dur > 0) minOf(dur, player.currentPosition + 10_000L) else player.currentPosition + 10_000L)
+                                    true
+                                }
+                                else -> false
+                            }
+                        } else false
+                    }
+                    setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
+                        isHudVisible = visibility == android.view.View.VISIBLE
+                    })
+                    playerViewRef.value = this
+                    requestFocus()
                 }
+            },
+            update = { view ->
+                if (playerViewRef.value !== view) playerViewRef.value = view
             },
             modifier = Modifier.fillMaxSize()
         )

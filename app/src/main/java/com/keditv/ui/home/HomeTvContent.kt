@@ -18,6 +18,10 @@ import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import com.keditv.domain.model.Favorite
+import com.keditv.domain.model.WatchHistory
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -47,14 +51,58 @@ import com.keditv.domain.model.ContentType
 import com.keditv.ui.common.ContentCard
 import com.keditv.ui.theme.*
 
+private sealed class ContextMenuTarget {
+    data class History(val item: WatchHistory) : ContextMenuTarget()
+    data class Fav(val item: Favorite) : ContextMenuTarget()
+}
+
 @Composable
 fun HomeTvContent(
     state: HomeUiState,
     onCategoryClick: (String) -> Unit,
     onItemClick: (String, Int) -> Unit,
     onContinueClick: (String, Int, Int?) -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onRemoveFromHistory: (WatchHistory) -> Unit = {},
+    onRemoveFromFavorites: (Favorite) -> Unit = {}
 ) {
+    var contextMenuTarget by remember { mutableStateOf<ContextMenuTarget?>(null) }
+
+    // ─── Context menu dialog ───────────────────────────────────────
+    contextMenuTarget?.let { target ->
+        val itemName = when (target) {
+            is ContextMenuTarget.History -> target.item.episodeTitle ?: target.item.name
+            is ContextMenuTarget.Fav -> target.item.name
+        }
+        AlertDialog(
+            onDismissRequest = { contextMenuTarget = null },
+            title = { Text(itemName, style = MaterialTheme.typography.titleMedium, color = NeonTextPrimary, maxLines = 1) },
+            text = null,
+            confirmButton = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(onClick = {
+                        when (target) {
+                            is ContextMenuTarget.History -> onItemClick(target.item.type.name, target.item.streamId)
+                            is ContextMenuTarget.Fav -> onItemClick(target.item.type.name, target.item.streamId)
+                        }
+                        contextMenuTarget = null
+                    }) { Text("Detaya Git", color = NeonCyan) }
+                    TextButton(onClick = {
+                        when (target) {
+                            is ContextMenuTarget.History -> onRemoveFromHistory(target.item)
+                            is ContextMenuTarget.Fav -> onRemoveFromFavorites(target.item)
+                        }
+                        contextMenuTarget = null
+                    }) { Text("Kaldır", color = NeonCoral) }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { contextMenuTarget = null }) { Text("İptal", color = NeonTextSecondary) }
+            },
+            containerColor = NeonSurface
+        )
+    }
+
     TvLazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -93,7 +141,8 @@ fun HomeTvContent(
                         ContentCard(
                             name = item.episodeTitle ?: item.name,
                             posterUrl = item.posterUrl,
-                            onClick = { onContinueClick(item.type.name, item.streamId, item.episodeId) }
+                            onClick = { onContinueClick(item.type.name, item.streamId, item.episodeId) },
+                            onLongClick = { contextMenuTarget = ContextMenuTarget.History(item) }
                         )
                     }
                 }
@@ -118,7 +167,8 @@ fun HomeTvContent(
                         ContentCard(
                             name = item.name,
                             posterUrl = item.posterUrl,
-                            onClick = { onItemClick(item.type.name, item.streamId) }
+                            onClick = { onItemClick(item.type.name, item.streamId) },
+                            onLongClick = { contextMenuTarget = ContextMenuTarget.Fav(item) }
                         )
                     }
                 }

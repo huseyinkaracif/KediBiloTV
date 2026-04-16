@@ -63,7 +63,8 @@ class HomeViewModel @Inject constructor(
                 kotlinx.coroutines.delay(5_000)
                 val items = _state.value.featuredItems
                 if (items.size > 1) {
-                    val next = (_state.value.currentFeaturedIndex + 1) % items.size
+                    val current = _state.value.currentFeaturedIndex
+                    val next = (0 until items.size).filter { it != current }.random()
                     _state.value = _state.value.copy(currentFeaturedIndex = next)
                 }
             }
@@ -85,6 +86,12 @@ class HomeViewModel @Inject constructor(
     fun deleteFromHistory(history: WatchHistory) {
         viewModelScope.launch {
             watchHistoryRepository.delete(history.streamId, history.type, history.episodeId)
+        }
+    }
+
+    fun removeFromFavorites(favorite: Favorite) {
+        viewModelScope.launch {
+            favoriteRepository.removeFavorite(favorite.streamId, favorite.type)
         }
     }
 
