@@ -5,4 +5,10 @@
         <item name="android:statusBarColor">@color/neon_background</item>
         <item name="android:navigationBarColor">@color/neon_background</item>
     </style>
+
+    <style name="Theme.KediTV.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/neon_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.KediTV</item>
+    </style>
 </resources>

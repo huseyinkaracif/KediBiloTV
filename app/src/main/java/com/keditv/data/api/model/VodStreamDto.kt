@@ -10,5 +10,6 @@ data class VodStreamDto(
     @SerialName("stream_icon") val streamIcon: String? = null,
     @SerialName("category_id") val categoryId: String? = null,
     @SerialName("rating") val rating: String? = null,
-    @SerialName("plot") val plot: String? = null
+    @SerialName("plot") val plot: String? = null,
+    @SerialName("container_extension") val containerExtension: String = "mp4"
 )

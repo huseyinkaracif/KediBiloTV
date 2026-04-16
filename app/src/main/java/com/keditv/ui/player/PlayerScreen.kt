@@ -78,6 +78,22 @@ fun PlayerScreen(
         }
     }
 
+    if (state.error != null) {
+        val errorMessage = state.error!!
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.Black),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = errorMessage,
+                color = Color.White,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(32.dp)
+            )
+        }
+        return
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         AndroidView(
             factory = {

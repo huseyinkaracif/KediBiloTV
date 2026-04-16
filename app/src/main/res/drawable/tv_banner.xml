@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#040E0E"
+        android:pathData="M0,0 L320,0 L320,180 L0,180 Z" />
+
+    <!-- Subtle grid lines -->
+    <path
+        android:strokeColor="#00FFD120"
+        android:strokeWidth="0.5"
+        android:pathData="M0,60 L320,60 M0,120 L320,120 M80,0 L80,180 M160,0 L160,180 M240,0 L240,180" />
+
+    <!-- Bottom glow line -->
+    <path
+        android:strokeColor="#FF4500"
+        android:strokeWidth="2"
+        android:pathData="M0,176 L320,176" />
+
+    <!-- Cat head shape -->
+    <!-- Main face circle -->
+    <path
+        android:fillColor="#0A1A1A"
+        android:pathData="M60,90 A32,32 0 1,1 60,89.9 Z" />
+
+    <!-- Cat ears -->
+    <path
+        android:fillColor="#0A1A1A"
+        android:pathData="M36,68 L44,52 L52,68 Z" />
+    <path
+        android:fillColor="#0A1A1A"
+        android:pathData="M68,68 L76,52 L84,68 Z" />
+
+    <!-- Inner ear -->
+    <path
+        android:fillColor="#FF450060"
+        android:pathData="M38.5,67 L44,55 L49.5,67 Z" />
+    <path
+        android:fillColor="#FF450060"
+        android:pathData="M70.5,67 L76,55 L81.5,67 Z" />
+
+    <!-- Eye glow left -->
+    <path
+        android:fillColor="#00FFD130"
+        android:pathData="M50,88 A7,7 0 1,1 50,87.9 Z" />
+    <!-- Eye left -->
+    <path
+        android:fillColor="#00FFD1"
+        android:pathData="M50,88 A5,5 0 1,1 50,87.9 Z" />
+    <!-- Pupil left -->
+    <path
+        android:fillColor="#040E0E"
+        android:pathData="M50,88 A2,4 0 1,1 50,87.9 Z" />
+
+    <!-- Eye glow right -->
+    <path
+        android:fillColor="#00FFD130"
+        android:pathData="M70,88 A7,7 0 1,1 70,87.9 Z" />
+    <!-- Eye right -->
+    <path
+        android:fillColor="#00FFD1"
+        android:pathData="M70,88 A5,5 0 1,1 70,87.9 Z" />
+    <!-- Pupil right -->
+    <path
+        android:fillColor="#040E0E"
+        android:pathData="M70,88 A2,4 0 1,1 70,87.9 Z" />
+
+    <!-- Nose -->
+    <path
+        android:fillColor="#FF4500"
+        android:pathData="M58,95 L60,92 L62,95 L60,98 Z" />
+
+    <!-- Whiskers left -->
+    <path
+        android:strokeColor="#7AA8A8"
+        android:strokeWidth="0.8"
+        android:pathData="M30,93 L54,95" />
+    <path
+        android:strokeColor="#7AA8A8"
+        android:strokeWidth="0.8"
+        android:pathData="M30,97 L54,97" />
+    <path
+        android:strokeColor="#7AA8A8"
+        android:strokeWidth="0.8"
+        android:pathData="M30,101 L54,99" />
+
+    <!-- Whiskers right -->
+    <path
+        android:strokeColor="#7AA8A8"
+        android:strokeWidth="0.8"
+        android:pathData="M66,95 L90,93" />
+    <path
+        android:strokeColor="#7AA8A8"
+        android:strokeWidth="0.8"
+        android:pathData="M66,97 L90,97" />
+    <path
+        android:strokeColor="#7AA8A8"
+        android:strokeWidth="0.8"
+        android:pathData="M66,99 L90,101" />
+
+    <!-- KEDI text -->
+    <!-- K -->
+    <path
+        android:fillColor="#F0F8F8"
+        android:pathData="M110,60 L116,60 L116,84 L122,72 L130,72 L122,86 L130,108 L122,108 L116,96 L116,108 L110,108 Z" />
+
+    <!-- E -->
+    <path
+        android:fillColor="#F0F8F8"
+        android:pathData="M134,60 L154,60 L154,66 L140,66 L140,81 L152,81 L152,87 L140,87 L140,102 L154,102 L154,108 L134,108 Z" />
+
+    <!-- D -->
+    <path
+        android:fillColor="#F0F8F8"
+        android:pathData="M158,60 L168,60 C180,60 186,70 186,84 C186,98 180,108 168,108 L158,108 Z M164,66 L164,102 L167,102 C174,102 180,96 180,84 C180,72 174,66 167,66 Z" />
+
+    <!-- I -->
+    <path
+        android:fillColor="#F0F8F8"
+        android:pathData="M190,60 L196,60 L196,108 L190,108 Z" />
+
+    <!-- TV text (smaller, coral) -->
+    <!-- T -->
+    <path
+        android:fillColor="#FF4500"
+        android:pathData="M210,118 L240,118 L240,123 L228,123 L228,145 L222,145 L222,123 L210,123 Z" />
+
+    <!-- V -->
+    <path
+        android:fillColor="#FF4500"
+        android:pathData="M243,118 L249,118 L255,138 L261,118 L267,118 L258,145 L252,145 Z" />
+
+    <!-- Accent dot -->
+    <path
+        android:fillColor="#00FFD1"
+        android:pathData="M200,131 A4,4 0 1,1 200,130.9 Z" />
+
+    <!-- Corner accents -->
+    <path
+        android:strokeColor="#FF450040"
+        android:strokeWidth="1.5"
+        android:pathData="M0,0 L20,0 M0,0 L0,20" />
+    <path
+        android:strokeColor="#FF450040"
+        android:strokeWidth="1.5"
+        android:pathData="M300,0 L320,0 M320,0 L320,20" />
+    <path
+        android:strokeColor="#FF450040"
+        android:strokeWidth="1.5"
+        android:pathData="M0,160 L0,180 M0,180 L20,180" />
+    <path
+        android:strokeColor="#FF450040"
+        android:strokeWidth="1.5"
+        android:pathData="M320,160 L320,180 M300,180 L320,180" />
+
+</vector>

@@ -29,13 +29,20 @@ class ContentRepositoryImpl @Inject constructor(
     // Dizi detay cache — her dizi için bir kez çekilir (ağır istek)
     private val seriesInfoCache = mutableMapOf<Int, SeriesInfo>()
 
+    // Extension cache — streamId/episodeId başına container extension
+    private val vodExtCache = mutableMapOf<Int, String>()      // streamId -> extension
+    private val episodeExtCache = mutableMapOf<Int, String>()  // episodeId -> extension
+
     // ── Ham DTO erişimi: cache'e bak, yoksa API'den çek, cache'e yaz ──
 
     private suspend fun fetchLive(): List<LiveStreamDto> =
         rawLiveStreams ?: api.getLiveStreams().also { rawLiveStreams = it }
 
     private suspend fun fetchVod(): List<VodStreamDto> =
-        rawVodStreams ?: api.getVodStreams().also { rawVodStreams = it }
+        rawVodStreams ?: api.getVodStreams().also { streams ->
+            rawVodStreams = streams
+            streams.forEach { it.streamId?.let { id -> vodExtCache[id] = it.containerExtension } }
+        }
 
     private suspend fun fetchSeries(): List<SeriesDto> =
         rawSeriesStreams ?: api.getSeries().also { rawSeriesStreams = it }
@@ -163,8 +170,10 @@ class ContentRepositoryImpl @Inject constructor(
                     seasonNumber = seasonNum.toIntOrNull() ?: 0,
                     name = "Sezon $seasonNum",
                     episodes = episodes.map { ep ->
+                        val epId = ep.id.toIntOrNull() ?: 0
+                        episodeExtCache[epId] = ep.containerExtension
                         Episode(
-                            id = ep.id.toIntOrNull() ?: 0,
+                            id = epId,
                             episodeNumber = ep.episodeNum,
                             title = ep.title,
                             posterUrl = ep.info?.movieImage,
@@ -194,11 +203,12 @@ class ContentRepositoryImpl @Inject constructor(
 
     override fun buildStreamUrl(type: ContentType, streamId: Int): String = when (type) {
         ContentType.LIVE -> api.buildStreamUrl("live", streamId)
-        ContentType.VOD -> api.buildVodUrl(streamId)
+        ContentType.VOD -> api.buildVodUrl(streamId, vodExtCache[streamId] ?: "mp4")
         ContentType.SERIES -> api.buildSeriesUrl(streamId)
     }
 
-    override fun buildEpisodeUrl(episodeId: Int): String = api.buildSeriesUrl(episodeId)
+    override fun buildEpisodeUrl(episodeId: Int): String =
+        api.buildSeriesUrl(episodeId, episodeExtCache[episodeId] ?: "mp4")
 
     fun clearCache() {
         categoryCache.clear()

@@ -43,20 +43,24 @@ class PlayerViewModel @Inject constructor(
 
     private fun loadStreamUrl() {
         viewModelScope.launch {
-            val url = if (episodeId != null) {
-                contentRepository.buildEpisodeUrl(episodeId)
-            } else {
-                contentRepository.buildStreamUrl(type, streamId)
+            try {
+                val history = watchHistoryRepository.getProgress(streamId, episodeId)
+                // getStreamInfo önce çağrılır: VOD/bölüm extension cache'ini doldurur
+                val info = contentRepository.getStreamInfo(type, streamId)
+                val url = if (episodeId != null) {
+                    contentRepository.buildEpisodeUrl(episodeId)
+                } else {
+                    contentRepository.buildStreamUrl(type, streamId)
+                }
+                _state.value = _state.value.copy(
+                    streamUrl = url,
+                    startPositionMs = history?.positionMs ?: 0,
+                    contentName = history?.name?.takeIf { it.isNotBlank() } ?: info?.name ?: "",
+                    contentPosterUrl = history?.posterUrl ?: info?.posterUrl
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(error = e.message ?: "Yükleme hatası")
             }
-
-            val history = watchHistoryRepository.getProgress(streamId, episodeId)
-            val info = contentRepository.getStreamInfo(type, streamId)
-            _state.value = _state.value.copy(
-                streamUrl = url,
-                startPositionMs = history?.positionMs ?: 0,
-                contentName = history?.name?.takeIf { it.isNotBlank() } ?: info?.name ?: "",
-                contentPosterUrl = history?.posterUrl ?: info?.posterUrl
-            )
         }
     }
 

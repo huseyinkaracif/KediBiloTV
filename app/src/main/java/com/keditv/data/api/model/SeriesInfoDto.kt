@@ -23,7 +23,8 @@ data class EpisodeDto(
     @SerialName("id") val id: String,
     @SerialName("episode_num") val episodeNum: Int,
     @SerialName("title") val title: String,
-    @SerialName("info") val info: EpisodeInfoDto? = null
+    @SerialName("info") val info: EpisodeInfoDto? = null,
+    @SerialName("container_extension") val containerExtension: String = "mp4"
 )
 
 @Serializable

@@ -111,9 +111,9 @@ class XtreamApiService @Inject constructor(
     fun buildStreamUrl(type: String, streamId: Int): String =
         "$baseUrl/$type/$username/$password/$streamId.ts"
 
-    fun buildVodUrl(streamId: Int): String =
-        "$baseUrl/movie/$username/$password/$streamId.mp4"
+    fun buildVodUrl(streamId: Int, ext: String = "mp4"): String =
+        "$baseUrl/movie/$username/$password/$streamId.$ext"
 
-    fun buildSeriesUrl(episodeId: Int): String =
-        "$baseUrl/series/$username/$password/$episodeId.mp4"
+    fun buildSeriesUrl(episodeId: Int, ext: String = "mp4"): String =
+        "$baseUrl/series/$username/$password/$episodeId.$ext"
 }
