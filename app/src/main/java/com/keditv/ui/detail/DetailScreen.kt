@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.focusable
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
@@ -101,15 +102,22 @@ private fun DetailContent(
 ) {
     val hasProgress = state.watchHistory != null && state.watchHistory.positionMs > 0
     val playFocusRequester = remember { FocusRequester() }
+    val firstEpisodeFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
-        runCatching { playFocusRequester.requestFocus() }
+    LaunchedEffect(state.contentType, state.seriesInfo) {
+        if (state.contentType == ContentType.SERIES) {
+            if (state.seriesInfo != null) {
+                runCatching { firstEpisodeFocusRequester.requestFocus() }
+            }
+        } else {
+            runCatching { playFocusRequester.requestFocus() }
+        }
     }
 
     TvLazyColumn(modifier = Modifier.fillMaxSize()) {
         // ── Poster hero ──
         item {
-            Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
+            Box(modifier = Modifier.fillMaxWidth().height(260.dp)) {
                 AsyncImage(
                     model = state.posterUrl,
                     contentDescription = state.name,
@@ -120,7 +128,7 @@ private fun DetailContent(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
+                        .height(160.dp)
                         .align(Alignment.BottomCenter)
                         .background(
                             Brush.verticalGradient(listOf(Color.Transparent, NeonBackground))
@@ -259,11 +267,12 @@ private fun DetailContent(
 
                 val currentSeason = info.seasons.find { it.seasonNumber == state.selectedSeason }
                 currentSeason?.episodes?.let { episodes ->
-                    tvItems(episodes) { episode ->
+                    tvItems(episodes.withIndex().toList()) { (index, episode) ->
                         EpisodeCard(
                             number = episode.episodeNumber,
                             title = episode.title,
                             duration = episode.duration,
+                            focusRequester = if (index == 0) firstEpisodeFocusRequester else null,
                             onClick = { onPlay(ContentType.SERIES.name, state.streamId, episode.id) }
                         )
                     }
@@ -385,7 +394,13 @@ private fun RatingBadge(rating: String) {
 // ─────────────────────────────────────────────────────────────────
 
 @Composable
-private fun EpisodeCard(number: Int, title: String, duration: String?, onClick: () -> Unit) {
+private fun EpisodeCard(
+    number: Int,
+    title: String,
+    duration: String?,
+    focusRequester: FocusRequester? = null,
+    onClick: () -> Unit
+) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     var isFocused by remember { mutableStateOf(false) }
@@ -398,6 +413,9 @@ private fun EpisodeCard(number: Int, title: String, duration: String?, onClick: 
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh),
         label = "ep_scale"
     )
+
+    val focusModifier = if (focusRequester != null)
+        Modifier.focusRequester(focusRequester) else Modifier
 
     Row(
         modifier = Modifier
@@ -412,6 +430,8 @@ private fun EpisodeCard(number: Int, title: String, duration: String?, onClick: 
                 shape = RoundedCornerShape(10.dp)
             )
             .onFocusChanged { isFocused = it.isFocused }
+            .then(focusModifier)
+            .focusable(interactionSource = interactionSource)
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
